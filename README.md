@@ -43,14 +43,15 @@
  
  
 ### 预览图
-![](https://github.com/jxnu-liguobin/SpringBoot-Base-System/blob/master/base/images/%E6%9F%A5%E8%AF%A2.png)
-![](https://github.com/jxnu-liguobin/SpringBoot-Base-System/blob/master/base/images/%E7%99%BB%E5%BD%95%E6%B3%A8%E5%86%8C.png)
-![](https://github.com/jxnu-liguobin/SpringBoot-Base-System/blob/master/base/images/%E5%AF%86%E7%A0%81%E9%99%90%E5%88%B6.png)
-![](https://github.com/jxnu-liguobin/SpringBoot-Base-System/blob/master/base/images/xmind%E5%9B%BE.png)
-![](https://github.com/jxnu-liguobin/SpringBoot-Base-System/blob/master/base/images/%E6%93%8D%E4%BD%9C%E8%AE%B0%E5%BD%95.png)
+![](./images/登录注册.png)
+![](./images/操作记录.png)
+![](./images/查询.png)
+![](./images/密码限制.png)
+![](./images/用户管理.png)
+![](./images/xmind图.png)
+
 补充GIF验证码
- ![](https://github.com/jxnu-liguobin/SpringBoot-Base-System/blob/master/base/images/%E6%9B%B4%E6%96%B0.png)
- 
+![](./images/GIF.png)
  
 ### 使用：
     1）使用mysql数据库，先建立一个空数据库base，使用utf-8字符集。
