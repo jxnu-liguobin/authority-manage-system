@@ -1,0 +1,7 @@
+/target/
+/.apt_generated/
+/.settings/
+/.cache-tests
+/.cache-main
+/.factorypath
+/base/
