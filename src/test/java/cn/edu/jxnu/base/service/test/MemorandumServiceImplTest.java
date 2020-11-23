@@ -26,7 +26,7 @@ public class MemorandumServiceImplTest {
 
     @Test
     public void testFindString() {
-        Memorandum memorandum = memorandumService.find(1);
+        Memorandum memorandum = memorandumService.find(1).block();
         System.out.println(memorandum);
     }
 

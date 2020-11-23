@@ -95,12 +95,12 @@ public class AdminIndexController extends BaseController {
     /**
      * 登录页面的注册专用
      */
-    @RequestMapping(value = {"/assets/edit"},method = RequestMethod.POST)
+    @RequestMapping(value = {"/assets/edit"}, method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> registAdd(User user, ModelMap map) {
         try {
             log.info("regist:" + user.toString());
-            userService.saveOrUpdate(user);
+            userService.saveOrUpdate(user).subscribe();
         } catch (Exception e) {
             return Mono.just(JsonResult.failure(e.getMessage()));
         }
@@ -108,12 +108,12 @@ public class AdminIndexController extends BaseController {
     }
 
     /**
-     * 验证用户名【学号】是否已经被注册,委托给用户控制层
+     * 验证用户名【学号】是否已经被注册，委托给用户控制层
      */
     @RequestMapping(value = {"/assets/isAvailable"})
     public void isAvailableUse(String userCode, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        log.info("前台验证账户可用");
+        log.info("前台验证账户可用: /assets/isAvailable");
         request.getRequestDispatcher("/admin/user/isAvailable/" + userCode).forward(request, response);
     }
 
@@ -121,7 +121,7 @@ public class AdminIndexController extends BaseController {
      * 所有人均可修改的个人信息
      */
     @ResponseBody
-    @RequestMapping(value = {"/assets/update"},method = RequestMethod.POST)
+    @RequestMapping(value = {"/assets/update"}, method = RequestMethod.POST)
     public Mono<JsonResult> allCanUpdate(User user, ModelMap map, HttpServletResponse response) {
         log.info("path: /assets/update, user: " + user.toString());
         try {
@@ -132,7 +132,7 @@ public class AdminIndexController extends BaseController {
                 map.put("message", "因超时无法获取您的个人信息，即将退出登录");
                 redirect(response, "/admin/logout");
             }
-            userService.saveOrUpdate(user);
+            userService.saveOrUpdate(user).subscribe();
             // 更新session
             SecurityUtils.getSubject().getSession().setAttribute(Constats.CURRENTUSER + user.getId(), user);
         } catch (Exception e) {
@@ -149,8 +149,8 @@ public class AdminIndexController extends BaseController {
     @ResponseBody
     public Mono<Page<BorrowBook>> borrowList(ModelMap map, @RequestParam(value = "uCode") String uCode, HttpServletRequest request,
                                              HttpServletResponse response) {
-        User u = userService.findByUserCode(uCode);
-        SimpleSpecificationBuilder<BorrowBook> builder = new SimpleSpecificationBuilder<BorrowBook>();
+        Mono<User> uMono = userService.findByUserCode(uCode);
+        SimpleSpecificationBuilder<BorrowBook> builder = new SimpleSpecificationBuilder<>();
         String bookName = request.getParameter("inputBookName");
         String bookAuthor = request.getParameter("inputAuthor");
         String bookPress = request.getParameter("inputPublication");
@@ -164,23 +164,23 @@ public class AdminIndexController extends BaseController {
         if (StringUtils.isNotBlank(bookPress)) {
             builder.add("bookPress", Operator.likeAll.name(), bookPress);
         }
-        User user = (User) SecurityUtils.getSubject().getSession().getAttribute(Constats.CURRENTUSER + u.getId());
-        if (user.getId() != null) {
-            builder.add("userId", Operator.eq.name(), user.getId());
-        } else {
-            // 已经过期
-            try {
-                throw new TimeoutException("因超时无法获取您的个人信息,即将退出登录");
-            } catch (TimeoutException e) {
-                map.put("message", e.getMessage());
-            } finally {
-                // 重定向到登录页面
-                redirect(response, "/admin/logout");
+        uMono.map(u -> (User) SecurityUtils.getSubject().getSession().getAttribute(Constats.CURRENTUSER + u.getId())).subscribe(user -> {
+            if (user.getId() != null) {
+                builder.add("userId", Operator.eq.name(), user.getId());
+            } else {
+                // 已经过期
+                try {
+                    throw new TimeoutException("因超时无法获取您的个人信息,即将退出登录");
+                } catch (TimeoutException e) {
+                    map.put("message", e.getMessage());
+                } finally {
+                    // 重定向到登录页面
+                    redirect(response, "/admin/logout");
+                }
             }
-        }
+        });
         // 得到已借阅的书籍
-        Page<BorrowBook> page = borrowBookService.findAll(builder.generateSpecification(), getPageRequest(request));
-        return Mono.just(page);
+        return borrowBookService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
 }

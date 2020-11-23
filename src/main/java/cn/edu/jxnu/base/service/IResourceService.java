@@ -2,8 +2,8 @@ package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.Resource;
 import cn.edu.jxnu.base.entity.ZtreeView;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * 资源服务接口
@@ -19,14 +19,15 @@ public interface IResourceService extends IBaseService<Resource, Integer> {
      * @param roleId
      * @return List<ZtreeView>
      */
-    List<ZtreeView> tree(int roleId);
+    Flux<ZtreeView> tree(int roleId);
 
     /**
      * 修改或者新增资源
      *
      * @param resource
+     * @return
      */
-    void saveOrUpdate(Resource resource);
+    Mono<Resource> saveOrUpdate(Resource resource);
 
     /**
      * 根据id查询资源
@@ -35,6 +36,6 @@ public interface IResourceService extends IBaseService<Resource, Integer> {
      * @return Resource
      * @author 梦境迷离
      */
-    Resource find(Integer integer);
+    Mono<Resource> find(Integer integer);
 
 }

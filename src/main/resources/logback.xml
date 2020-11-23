@@ -50,6 +50,9 @@
     <logger name="org.hibernate">
         <level value="INFO"/>
     </logger>
+    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
     <logger name="org.hibernate.SQL">
         <level value="DEBUG"/>
     </logger>

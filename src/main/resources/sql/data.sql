@@ -16,7 +16,6 @@ INSERT INTO `tb_resource` VALUES ('12', '2018-03-01 11:21:52', '资源修改', n
 INSERT INTO `tb_resource` VALUES ('13', '2018-03-01 11:21:54', '资源添加', null, '0', '3', '资源添加', '2', 'system:resource:add', '/admin/resource/add', '2', '2018-04-01 11:22:39', '11');
 INSERT INTO `tb_resource` VALUES ('14', '2018-03-01 11:21:54', '资源删除', null, '0', '3', '资源删除', '3', 'system:resource:deleteBatch', '/admin/resource/deleteBatch', '2', '2018-04-01 14:12:31', '11');
 INSERT INTO `tb_resource` VALUES ('15', '2018-03-01 11:21:54', '图书管理', null, '0', '2', '图书管理', '4', 'system:books:book_management', '/admin/books/book_management', '1', '2018-04-01 14:12:31', null);
-INSERT INTO `tb_resource` VALUES ('16', '2018-03-01 09:45:58', 'SQL监控', null, '0', '2', 'SQL监控', '2', 'system:resource:druid', '/druid', '1', '2018-04-01 09:45:58', null);
 INSERT INTO `tb_resource` VALUES ('17', '2018-04-02 11:37:23', '用户恢复', null, '0', '3', '用户恢复', '2', 'system:user:resume', '/admin/user/resume', '2', '2018-04-02 11:37:23', '1');
 INSERT INTO `tb_resource` VALUES ('18', '2018-05-02 08:28:58', '备忘记录', null, '0', '2', '备忘记录', '2', 'system:memorandum:memorandum', '/admin/memorandum/*', '1', '2018-05-02 08:28:58', null);
 
@@ -51,7 +50,7 @@ INSERT INTO `tb_role_resource` VALUES ('1', '18');
 -- ----------------------------
 -- Records of tb_user
 -- ----------------------------
-INSERT INTO `tb_user` VALUES ('1', 'admin', 'admin', '2017-01-09 17:26:41', '0', '0', 'S6557FPFLS0IL5VMMIA5AMUBJ', '13065120502', '2018-04-10 11:16:45');
+INSERT INTO `tb_user` VALUES ('1', 'admin', 'admin', '2017-01-09 17:26:41', '0', '0', '3931MUEQD1939MQMLM4AISPVNE', '13065120502', '2018-04-10 11:16:45');
 INSERT INTO `tb_user` VALUES ('2', '1418140303', 'James', '2017-04-20 22:48:34', '0', '0', '37UKUUGEAAS613NRTV84V1409O', '15820582502', '2018-04-10 11:13:01');
 INSERT INTO `tb_user` VALUES ('12', '1418140304', 'Jon', '2017-05-04 19:31:10', '0', '0', '23QPTHDNUT5MB5UPK1RI1GA1IQ', '15825624789', '2018-04-04 10:37:09');
 INSERT INTO `tb_user` VALUES ('15', '1526705078', 'LGG', '2018-04-03 11:59:38', '0', '0', '3IH0UBLIE3JLE6UUF9OJPS16UM', '13065120502', '2018-04-10 10:25:00');

@@ -20,7 +20,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 系统资源控制类
@@ -40,8 +39,8 @@ public class ResourceController extends BaseController {
      */
     @RequestMapping("/tree/{resourceId}")
     @ResponseBody
-    public Flux<List<ZtreeView>> tree(@PathVariable Integer resourceId) {
-        return Flux.just(resourceService.tree(resourceId));
+    public Flux<ZtreeView> tree(@PathVariable Integer resourceId) {
+        return resourceService.tree(resourceId);
     }
 
     /**
@@ -57,7 +56,7 @@ public class ResourceController extends BaseController {
     /**
      * 资源管理分页
      */
-    @RequestMapping(value = "/list",method = {RequestMethod.POST})
+    @RequestMapping(value = "/list", method = {RequestMethod.POST})
     @ResponseBody
     public Mono<Page<Resource>> list(HttpServletRequest request) {
         SimpleSpecificationBuilder<Resource> builder = new SimpleSpecificationBuilder<Resource>();
@@ -65,8 +64,7 @@ public class ResourceController extends BaseController {
         if (StringUtils.isNotBlank(searchText)) {
             builder.add("name", Operator.likeAll.name(), searchText);
         }
-        Page<Resource> page = resourceService.findAll(builder.generateSpecification(), getPageRequest(request));
-        return Mono.just(page);
+        return resourceService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
     /**
@@ -76,8 +74,8 @@ public class ResourceController extends BaseController {
      */
     @RequestMapping(value = "/add")
     public String add(ModelMap map) {
-        List<Resource> list = resourceService.findAll();
-        map.put("list", list);
+        Flux<Resource> list = resourceService.findAll();
+        list.subscribe(l -> map.put("list", l));
         return "admin/resource/form";
     }
 
@@ -88,10 +86,10 @@ public class ResourceController extends BaseController {
      */
     @RequestMapping(value = "/edit/{id}")
     public String edit(@PathVariable Integer id, ModelMap map) {
-        Resource resource = resourceService.find(id);
-        map.put("resource", resource);
-        List<Resource> list = resourceService.findAll();
-        map.put("list", list);
+        Mono<Resource> resource = resourceService.find(id);
+        resource.subscribe(r -> map.put("resource", resource));
+        Flux<Resource> list = resourceService.findAll();
+        list.subscribe(l -> map.put("list", l));
         return "admin/resource/form";
     }
 
@@ -102,7 +100,7 @@ public class ResourceController extends BaseController {
     @ResponseBody
     public Mono<JsonResult> edit(Resource resource, ModelMap map) {
         try {
-            resourceService.saveOrUpdate(resource);
+            resourceService.saveOrUpdate(resource).subscribe();
             // 可能存在需要在增加资源的时候默认给管理员增加权限
         } catch (Exception e) {
             return Mono.just(JsonResult.failure(e.getMessage()));
@@ -117,7 +115,7 @@ public class ResourceController extends BaseController {
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable Integer id, ModelMap map) {
         try {
-            resourceService.delete(id);
+            resourceService.delete(id).subscribe();
         } catch (Exception e) {
             e.printStackTrace();
             return Mono.just(JsonResult.failure(e.getMessage()));

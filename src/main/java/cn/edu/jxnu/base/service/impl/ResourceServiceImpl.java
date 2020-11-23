@@ -14,6 +14,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -45,66 +47,74 @@ public class ResourceServiceImpl extends BaseServiceImpl<Resource, Integer> impl
 
     @Override
     @Cacheable(value = "resourceCache", key = "'tree' + #roleId") // 指定缓存在哪个Cache上[使用自定义的key]
-    public List<ZtreeView> tree(int roleId) {
+    public Flux<ZtreeView> tree(int roleId) {
         log.info("tree: " + roleId);
-        List<ZtreeView> resulTreeNodes = new ArrayList<ZtreeView>();
-        Role role = roleService.find(roleId);
-        Set<Resource> roleResources = role.getResources();
-        resulTreeNodes.add(new ZtreeView(0L, null, "系统菜单", true));
-        ZtreeView node;
-        Sort sort = new Sort(Direction.ASC, "parent", "id", "sort");
-        List<Resource> all = resourceDao.findAll(sort);
-        for (Resource resource : all) {
-            node = new ZtreeView();
-            node.setId(Long.valueOf(resource.getId()));
-            if (resource.getParent() == null) {
-                node.setpId(0L);
-            } else {
-                node.setpId(Long.valueOf(resource.getParent().getId()));
+        final List<ZtreeView> resultTreeNodes = new ArrayList<>();
+        Mono<Role> r = roleService.find(roleId);
+        return r.map(role -> {
+            Set<Resource> roleResources = role.getResources();
+            resultTreeNodes.add(new ZtreeView(0L, null, "系统菜单", true));
+            ZtreeView node;
+            Sort sort = new Sort(Direction.ASC, "parent", "id", "sort");
+            List<Resource> all = resourceDao.findAll(sort);
+            for (Resource resource : all) {
+                node = new ZtreeView();
+                node.setId(Long.valueOf(resource.getId()));
+                if (resource.getParent() == null) {
+                    node.setpId(0L);
+                } else {
+                    node.setpId(Long.valueOf(resource.getParent().getId()));
+                }
+                node.setName(resource.getName());
+                if (roleResources != null && roleResources.contains(resource)) {
+                    node.setChecked(true);
+                }
+                resultTreeNodes.add(node);
             }
-            node.setName(resource.getName());
-            if (roleResources != null && roleResources.contains(resource)) {
-                node.setChecked(true);
-            }
-            resulTreeNodes.add(node);
-        }
-        return resulTreeNodes;
+            return resultTreeNodes;
+        }).flatMapMany(Flux::fromIterable);
     }
 
     /**
      * 超级管理员不能分配资源
+     *
+     * @return
      */
     @Override
     @CacheEvict(value = "resourceCache") // 清除缓存元素外
-    public void saveOrUpdate(Resource resource) {
-        log.info("saveOrUpdate:" + resource.toString());
+    public Mono<Resource> saveOrUpdate(Resource resource) {
+        log.info("saveOrUpdate: " + resource.toString());
         if (resource.getId() != null) {
-            Resource dbResource = find(resource.getId());
-            dbResource.setUpdateTime(new Date());
-            dbResource.setName(resource.getName());
-            dbResource.setSourceKey(resource.getSourceKey());
-            dbResource.setType(resource.getType());
-            dbResource.setSourceUrl(resource.getSourceUrl());
-            dbResource.setLevel(resource.getLevel());
-            dbResource.setSort(resource.getSort());
-            dbResource.setIsHide(resource.getIsHide());
-            dbResource.setIcon(resource.getIcon());
-            dbResource.setDescription(resource.getDescription());
-            dbResource.setUpdateTime(new Date());
-            dbResource.setParent(resource.getParent());
-            update(dbResource);
+            Mono<Resource> r = find(resource.getId());
+            return r.map(dbResource -> {
+                        dbResource.setUpdateTime(new Date());
+                        dbResource.setName(resource.getName());
+                        dbResource.setSourceKey(resource.getSourceKey());
+                        dbResource.setType(resource.getType());
+                        dbResource.setSourceUrl(resource.getSourceUrl());
+                        dbResource.setLevel(resource.getLevel());
+                        dbResource.setSort(resource.getSort());
+                        dbResource.setIsHide(resource.getIsHide());
+                        dbResource.setIcon(resource.getIcon());
+                        dbResource.setDescription(resource.getDescription());
+                        dbResource.setUpdateTime(new Date());
+                        dbResource.setParent(resource.getParent());
+                        update(dbResource).subscribe();
+                        return dbResource;
+                    }
+            );
         } else {
             resource.setCreateTime(new Date());
             resource.setUpdateTime(new Date());
-            save(resource);
+            return save(resource);
         }
     }
 
     @Override
     @CacheEvict(value = "resourceCache") // 清除缓存元素外
-    public void delete(Integer id) {
-        log.info("delete:" + id);
+    public Mono<Boolean> delete(Integer id) {
+        log.info("delete: " + id);
         resourceDao.deleteGrant(id);
-        super.delete(id);
+        return super.delete(id);
     }
 }

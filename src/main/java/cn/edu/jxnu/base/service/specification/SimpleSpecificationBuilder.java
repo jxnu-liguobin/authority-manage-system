@@ -24,7 +24,7 @@ public class SimpleSpecificationBuilder<T> {
      *
      * @param key
      * @param oper
-     * @param value</br>
+     * @param value
      */
     public SimpleSpecificationBuilder(String key, String oper, Object value) {
         SpecificationOperator so = new SpecificationOperator();
@@ -47,7 +47,7 @@ public class SimpleSpecificationBuilder<T> {
      * @param oper
      * @param value
      * @param join
-     * @return SimpleSpecificationBuilder构建好的查询 this，方便后续的链式调用</br>
+     * @return SimpleSpecificationBuilder构建好的查询 this，方便后续的链式调用
      */
     public SimpleSpecificationBuilder<T> add(String key, String oper, Object value, String join) {
         // System.out.println("key:"+key+","+"oper:"+oper+"join:"+join);
@@ -68,7 +68,7 @@ public class SimpleSpecificationBuilder<T> {
      * @param key
      * @param oper
      * @param value
-     * @return this，方便后续的链式调用</br>
+     * @return this，方便后续的链式调用
      */
     public SimpleSpecificationBuilder<T> addOr(String key, String oper, Object value) {
         return this.add(key, oper, value, Join.or.name());
@@ -80,7 +80,7 @@ public class SimpleSpecificationBuilder<T> {
      * @param key
      * @param oper
      * @param value
-     * @return this，方便后续的链式调用</br>
+     * @return this，方便后续的链式调用
      */
     public SimpleSpecificationBuilder<T> add(String key, String oper, Object value) {
         return this.add(key, oper, value, Join.and.name());

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,12 +80,12 @@ public class BookController extends BaseController {
      * <p>
      * 考虑书已经被借出去了，不能再删除
      */
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.POST)
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable String id, ModelMap map, @RequestParam("uCode") String uCode) {
         try {
-            List<User> ls = userService.findAll();
-            for (User user : ls) {
+            Flux<User> ls = userService.findAll();
+            ls.map(user -> {
                 // 得到所有用户，如果有，则不能删除
                 List<String> bookIdList = redisService.hashGet(Constats.BOOK_REDIS_KEY, user.getId());
                 if (bookIdList != null) {
@@ -95,11 +96,14 @@ public class BookController extends BaseController {
                         }
                     }
                 }
-            }
-            Book temp = bookService.findByBookId(id);
-            bookService.delete(id);
-            memorandumUtils.saveMemorandum(memorandumUtils, uCode, userService.findByUserCode(uCode).getUserName(),
-                    "删除图书", temp.getBookId() + " | " + temp.getBookName());
+                return null;
+            }).subscribe();
+            Mono<Book> tempMono = bookService.findByBookId(id);
+            tempMono.subscribe(temp -> {
+                bookService.delete(id).subscribe();
+                userService.findByUserCode(uCode).subscribe(u -> memorandumUtils.saveMemorandum(memorandumUtils, uCode, u.getUserName(),
+                        "删除图书", temp.getBookId() + " | " + temp.getBookName()));
+            });
         } catch (Exception e) {
             e.printStackTrace();
             return Mono.just(JsonResult.failure("删除失败"));
@@ -110,7 +114,7 @@ public class BookController extends BaseController {
     /**
      * 借书
      */
-    @RequestMapping(value = {"/borrowlist/{borrowlist}"},method = RequestMethod.POST)
+    @RequestMapping(value = {"/borrowlist/{borrowlist}"}, method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> borrowList(@PathVariable String borrowlist, ModelMap map) {
 
@@ -130,7 +134,8 @@ public class BookController extends BaseController {
                 book[i] = new Book();
                 borrowBook[i].setUserId(mBorrowList.getId());
                 borrowBook[i].setBookId(mBorrowList.getBooklist()[i]);
-                book[i] = bookService.findByBookId(mBorrowList.getBooklist()[i]);
+                int finalI = i;
+                bookService.findByBookId(mBorrowList.getBooklist()[i]).subscribe(b -> book[finalI] = b);
                 // 一本书只能借一次，因此需要判断一下该用户是否已经借过该书
                 BorrowBook isBorrowBook = borrowBookService.findByUserIdAndBookId(mBorrowList.getId(),
                         mBorrowList.getBooklist()[i]);
@@ -138,13 +143,15 @@ public class BookController extends BaseController {
                     if (isBorrowBook == null) {
                         book[i].setCurrentInventory(book[i].getCurrentInventory() - 1);
                         // 添加额外的属性
-                        Book book2 = bookService.findByBookId((book[i].getBookId()));//
-                        borrowBook[i].setBookName(book2.getBookName());
-                        borrowBook[i].setBookAuthor((book2.getBookAuthor()));
-                        borrowBook[i].setBookPress((book2.getBookPress()));
+                        int finalI1 = i;
+                        bookService.findByBookId((book[i].getBookId())).subscribe(b -> {
+                            borrowBook[finalI1].setBookName(b.getBookName());
+                            borrowBook[finalI1].setBookAuthor((b.getBookAuthor()));
+                            borrowBook[finalI1].setBookPress((b.getBookPress()));
+                        });
                         // 更新库存
-                        bookService.saveOrUpdate(book[i]);
-                        borrowBookService.save(borrowBook[i]);
+                        bookService.saveOrUpdate(book[i]).subscribe();
+                        borrowBookService.save(borrowBook[i]).subscribe();
                         // 添加到redis中
                         List<String> bookIdList = redisService.hashGet(Constats.BOOK_REDIS_KEY, mBorrowList.getId());
                         if (bookIdList == null) {
@@ -167,7 +174,6 @@ public class BookController extends BaseController {
 
                 i++;
             }
-            i = 0;
             return Mono.just(JsonResult.success());
         } else {
             return Mono.just(JsonResult.failure("未选择要借阅的书籍！"));
@@ -178,7 +184,7 @@ public class BookController extends BaseController {
     /**
      * 还书表
      */
-    @RequestMapping(value = {"/returnBookList/{id}"},method = RequestMethod.POST)
+    @RequestMapping(value = {"/returnBookList/{id}"}, method = RequestMethod.POST)
     @ResponseBody
     public Mono<String> returnBookList(@PathVariable String id, ModelMap map) {
 
@@ -186,7 +192,8 @@ public class BookController extends BaseController {
         Book[] books = new Book[borrowBooks.length];
         // Date date=null;
         for (int i = 0; i < books.length; i++) {
-            books[i] = bookService.findByBookId(borrowBooks[i].getBookId());
+            int finalI = i;
+            bookService.findByBookId(borrowBooks[i].getBookId()).subscribe(b -> books[finalI] = b);
         }
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("borrowBooks", borrowBooks);
@@ -200,7 +207,7 @@ public class BookController extends BaseController {
     /**
      * 管理员归还图书
      */
-    @RequestMapping(value = {"/returnBook/{borrowlist}"},method = RequestMethod.POST)
+    @RequestMapping(value = {"/returnBook/{borrowlist}"}, method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> returnBook(@PathVariable String borrowlist) throws Exception {
 
@@ -216,9 +223,10 @@ public class BookController extends BaseController {
             book[i] = new Book();
             borrowBook[i].setUserId(mBorrowList.getId());
             borrowBook[i].setBookId(mBorrowList.getBooklist()[i]);
-            book[i] = bookService.findByBookId(mBorrowList.getBooklist()[i]);
+            int finalI = i;
+            bookService.findByBookId(mBorrowList.getBooklist()[i]).subscribe(b -> book[finalI] = b);
             book[i].setCurrentInventory(book[i].getCurrentInventory() + 1);
-            bookService.saveOrUpdate(book[i]);
+            bookService.saveOrUpdate(book[i]).subscribe();
             if (bookIdList.contains(mBorrowList.getBooklist()[i])) {
                 // 判断借的书中有没有记录，有，删除
                 bookIdList.remove(mBorrowList.getBooklist()[i]);
@@ -261,10 +269,11 @@ public class BookController extends BaseController {
             System.out.println("当前还需还的书：" + bookIdList);
             // 重写添加到redis中
             redisService.putMap(Constats.BOOK_REDIS_KEY, map);
-            Book book = new Book();
-            book = bookService.findByBookId(bookId);
-            book.setCurrentInventory(book.getCurrentInventory() + 1);// 增加库存
-            bookService.saveOrUpdate(book);// 更新库存
+            Mono<Book> book = bookService.findByBookId(bookId);
+            book.subscribe(b -> {
+                b.setCurrentInventory(b.getCurrentInventory() + 1);// 增加库存
+                bookService.saveOrUpdate(b).subscribe();// 更新库存
+            });
             borrowBookService.deletByUserIdAndBookId(userId, bookId);// 注意这里是组合主键
         } catch (Exception e) {
             e.printStackTrace();
@@ -280,24 +289,24 @@ public class BookController extends BaseController {
      */
     @RequestMapping(value = "/edit/{id}")
     public String edit(@PathVariable String id, ModelMap map) {
-
-        Book book = bookService.findByBookId(id);
-        map.put("book", book);
+        bookService.findByBookId(id).subscribe(b -> map.put("book", b));
         return "admin/books/addform";
     }
 
     /**
      * 修改图书
      */
-    @RequestMapping(value = {"/edit"},method = RequestMethod.POST)
+    @RequestMapping(value = {"/edit"}, method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> edit(Book book, ModelMap map, @RequestParam("uCode") String uCode,
                                  @RequestParam("cInventory") Integer cInventory) {
         try {
 
-            bookService.saveOrUpdate(book, cInventory);
-            memorandumUtils.saveMemorandum(memorandumUtils, uCode, userService.findByUserCode(uCode).getUserName(),
-                    "修改/新增图书", book.getBookId() + " | " + book.getBookName());
+            bookService.saveOrUpdate(book, cInventory).subscribe();
+            userService.findByUserCode(uCode).subscribe(u -> {
+                memorandumUtils.saveMemorandum(memorandumUtils, uCode, u.getUserName(),
+                        "修改/新增图书", book.getBookId() + " | " + book.getBookName());
+            });
         } catch (Exception e) {
             return Mono.just(JsonResult.failure(e.getMessage()));
         }
@@ -342,8 +351,7 @@ public class BookController extends BaseController {
         if (StringUtils.isNotBlank(bookPress)) {
             builder.add("bookPress", Operator.likeAll.name(), bookPress);
         }
-        Page<Book> page = bookService.findAll(builder.generateSpecification(), getPageRequest(request));
-        return Mono.just(page);
+        return bookService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
 }

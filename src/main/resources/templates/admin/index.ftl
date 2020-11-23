@@ -93,12 +93,12 @@
             <a class="J_menuItem" href="${ctx!}/admin/resource/index"><i class="fa fa-check-square" aria-hidden="true"></i>&nbsp;资源管理</a>
         </li>
     </@shiro.hasPermission>
-    <!-- 当有资源管理权限的时候-system:resource:druid -->
-      <@shiro.hasPermission name="system:resource:druid">
-        <li>
-            <a class="J_menuItem" href="${ctx!}/druid"><i class="fa fa-cogs" aria-hidden="true"></i>SQL监控</a>
-        </li>
-    </@shiro.hasPermission>
+<#--    <!-- 当有资源管理权限的时候-system:resource:druid &ndash;&gt;-->
+<#--      <@shiro.hasPermission name="system:resource:druid">-->
+<#--        <li>-->
+<#--            <a class="J_menuItem" href="${ctx!}/druid"><i class="fa fa-cogs" aria-hidden="true"></i>SQL监控</a>-->
+<#--        </li>-->
+<#--    </@shiro.hasPermission>-->
    <!-- 粗略控制 -->
       <@shiro.hasPermission name="system:memorandum:memorandum">
         <li>

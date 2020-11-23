@@ -57,8 +57,7 @@ public class RoleController extends BaseController {
             builder.add("name", Operator.likeAll.name(), searchText);
             builder.addOr("description", Operator.likeAll.name(), searchText);
         }
-        Page<Role> page = roleService.findAll(builder.generateSpecification(), getPageRequest(request));
-        return Mono.just(page);
+        return roleService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
     /**
@@ -79,22 +78,22 @@ public class RoleController extends BaseController {
      */
     @RequestMapping(value = "/edit/{id}")
     public String edit(@PathVariable Integer id, ModelMap map) {
-        System.out.println("role id:" + id);
-        Role role = roleService.find(id);
-        map.put("role", role);
+        System.out.println("role id: " + id);
+        Mono<Role> role = roleService.find(id);
+        role.subscribe(r -> map.put("role", r));
         return "admin/role/form";
     }
 
     /**
      * 添加或修改角色
      */
-    @RequestMapping(value = {"/edit"},method = RequestMethod.POST)
+    @RequestMapping(value = {"/edit"}, method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> edit(Role role, ModelMap map, @RequestParam("uCode") String uCode) {
         try {
-            roleService.saveOrUpdate(role);
-            memorandumUtils.saveMemorandum(memorandumUtils, uCode, userService.findByUserCode(uCode).getUserName(),
-                    "修改/新增角色", role.getRoleKey() + " | " + role.getName());
+            roleService.saveOrUpdate(role).subscribe();
+            userService.findByUserCode(uCode).subscribe(u -> memorandumUtils.saveMemorandum(memorandumUtils, uCode, u.getUserName(),
+                    "修改/新增角色", role.getRoleKey() + " | " + role.getName()));
         } catch (Exception e) {
             return Mono.just(JsonResult.failure(e.getMessage()));
         }
@@ -104,13 +103,15 @@ public class RoleController extends BaseController {
     /**
      * 删除角色
      */
-    @RequestMapping(value = "/delete/{id}",method = RequestMethod.POST)
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable Integer id, ModelMap map, @RequestParam("uCode") String uCode) {
         try {
-            memorandumUtils.saveMemorandum(memorandumUtils, uCode, userService.findByUserCode(uCode).getUserName(),
-                    "删除角色", roleService.find(id).getRoleKey() + " | " + roleService.find(id).getName());
-            roleService.delete(id);
+            userService.findByUserCode(uCode).subscribe(u -> roleService.find(id).subscribe(r -> {
+                memorandumUtils.saveMemorandum(memorandumUtils, uCode, u.getUserName(),
+                        "删除角色", r.getRoleKey() + " | " + r.getName());
+                roleService.delete(id).subscribe();
+            }));
         } catch (Exception e) {
             e.printStackTrace();
             return Mono.just(JsonResult.failure(e.getMessage()));
@@ -123,8 +124,8 @@ public class RoleController extends BaseController {
      */
     @RequestMapping(value = "/grant/{id}")
     public String grant(@PathVariable Integer id, ModelMap map) {
-        Role role = roleService.find(id);
-        map.put("role", role);
+        Mono<Role> role = roleService.find(id);
+        role.subscribe(r -> map.put("role", r));
         return "admin/role/grant";
     }
 
@@ -136,7 +137,7 @@ public class RoleController extends BaseController {
     public Mono<JsonResult> grant(@PathVariable Integer id, @RequestParam(required = false) String[] resourceIds,
                                   ModelMap map) {
         try {
-            roleService.grant(id, resourceIds);
+            roleService.grant(id, resourceIds).subscribe();
         } catch (Exception e) {
             e.printStackTrace();
             return Mono.just(JsonResult.failure(e.getMessage()));

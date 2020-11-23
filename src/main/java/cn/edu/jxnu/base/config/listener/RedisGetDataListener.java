@@ -7,6 +7,7 @@ import cn.edu.jxnu.base.utils.Constats;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -40,10 +41,10 @@ public class RedisGetDataListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         log.info("开始初始化redis数据");
         Map<Integer, List<String>> map = new HashMap<>();
-        List<BorrowBook> listBook = borrowBookService.findAll();
-        List<String> sList;
-        for (BorrowBook borrowBook : listBook) {
+        Flux<BorrowBook> listBook = borrowBookService.findAll();
+        listBook.subscribe(borrowBook -> {
             // 启动的时候将数据放进redis中
+            List<String> sList;
             if (map.containsKey(borrowBook.getUserId())) {
                 sList = map.get(borrowBook.getUserId());
                 sList.add(borrowBook.getBookId());
@@ -54,7 +55,7 @@ public class RedisGetDataListener implements ServletContextListener {
                 sList.add(borrowBook.getBookId());
                 map.put(borrowBook.getUserId(), sList);
             }
-        }
+        });
         try {
             // 放进redis中
             redisService.putMap(Constats.BOOK_REDIS_KEY, map);

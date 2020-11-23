@@ -12,6 +12,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,24 +49,25 @@ public class MyRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         User user = (User) principals.getPrimaryPrincipal();
-        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        User dbUser = userService.findByUserName(user.getUserName());
-        Set<String> shiroPermissions = new HashSet<>();// 存放用户权限
-        Set<String> roleSet = new HashSet<String>();// 存放用户角色名
-        Set<Role> roles = dbUser.getRoles();// 从用户信息中获取用户拥有的角色
-        for (Role role : roles) {
-            // 对于用户的每个角色，获取角色拥有的资源
-            Set<Resource> resources = role.getResources();
-            for (Resource resource : resources) {
-                // 添加角色拥有的资源的全部id到集合中
-                shiroPermissions.add(resource.getSourceKey());
-
+        final SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        Mono<User> dbUserMono = userService.findByUserName(user.getUserName());
+        dbUserMono.subscribe(dbUser -> {
+            Set<String> shiroPermissions = new HashSet<>();// 存放用户权限
+            Set<String> roleSet = new HashSet<String>();// 存放用户角色名
+            Set<Role> roles = dbUser.getRoles();// 从用户信息中获取用户拥有的角色
+            for (Role role : roles) {
+                // 对于用户的每个角色，获取角色拥有的资源
+                Set<Resource> resources = role.getResources();
+                for (Resource resource : resources) {
+                    // 添加角色拥有的资源的全部id到集合中
+                    shiroPermissions.add(resource.getSourceKey());
+                }
+                // 保存用户的角色的id
+                roleSet.add(role.getRoleKey());
             }
-            // 保存用户的角色的id
-            roleSet.add(role.getRoleKey());
-        }
-        authorizationInfo.setRoles(roleSet);
-        authorizationInfo.setStringPermissions(shiroPermissions);
+            authorizationInfo.setRoles(roleSet);
+            authorizationInfo.setStringPermissions(shiroPermissions);
+        });
         return authorizationInfo;
     }
 
@@ -77,38 +79,34 @@ public class MyRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        SimpleAuthenticationInfo info = null;
         String userCode = (String) token.getPrincipal();
-        User user = userService.findByUserCode(userCode);
-        // 账号不存在
-        if (user == null) {
-            log.info("用户: " + userCode + " 不存在");
-            throw new UnknownAccountException("账号或密码不正确");
-        }
-        if (user.getLocked() == 1) {
-            log.info("账号已被锁定");
-            throw new UnknownAccountException("账号已被锁定");
-        }
-        // 用户名存在，但被注销。
-        if (user.getDeleteStatus() == 1) {
-            log.info("用户: " + user.toString() + " 账号已注销");
-            throw new UnknownAccountException("账号已注销");
-        }
-        info = new SimpleAuthenticationInfo(user, user.getPassword(), getName());
-        return info;
+        return userService.findByUserCode(userCode).map(user -> {
+            // 账号不存在
+            if (user == null) {
+                log.info("用户: " + userCode + " 不存在");
+                throw new UnknownAccountException("账号或密码不正确");
+            }
+            if (user.getLocked() == 1) {
+                log.info("账号已被锁定");
+                throw new UnknownAccountException("账号已被锁定");
+            }
+            // 用户名存在，但被注销。
+            if (user.getDeleteStatus() == 1) {
+                log.info("用户: " + user.toString() + " 账号已注销");
+                throw new UnknownAccountException("账号已注销");
+            }
+            return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+        }).block();
     }
 
     /**
      * 添加自动刷新授权缓存
      */
     public void clearCachedAuthorization(Integer id) {
-        User user = userService.find(id);
-        // 清空指定用户的权限缓存
-        SimpleAuthenticationInfo info;
-        info = new SimpleAuthenticationInfo(user, user.getPassword(), getName());
-
-        clearCachedAuthorizationInfo(info.getPrincipals());
-
-        /** 以上需要刷新生效. */
+        Mono<User> userMono = userService.find(id);
+        clearCachedAuthorizationInfo(userMono.map(user -> {
+            // 清空指定用户的权限缓存
+            return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+        }).block().getPrincipals());// 以上需要刷新生效
     }
 }

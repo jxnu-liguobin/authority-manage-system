@@ -32,7 +32,7 @@ public class SimpleSpecification<T> implements Specification<T> {
      * @param root
      * @param criteriaQuery
      * @param criteriaBuilder
-     * @return Predicate</ br>
+     * @return Predicate
      */
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {

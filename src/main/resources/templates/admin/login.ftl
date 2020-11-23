@@ -114,7 +114,7 @@ button {
 					},
 					vcode: {
 						required : "请输入验证码",
-						remote:"验证码错误,请刷新验证码",
+						remote:"验证码错误，请刷新验证码",
 					}
 				},
 				submitHandler : function(form) {

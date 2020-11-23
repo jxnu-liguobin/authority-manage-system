@@ -74,12 +74,6 @@
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--添加数据库连接池 -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.2.3</version>
-        </dependency>
         <!-- Ehcache -->
         <dependency>
             <groupId>net.sf.ehcache</groupId>

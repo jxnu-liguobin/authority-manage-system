@@ -55,9 +55,11 @@ public class MemorandumController extends BaseController {
         if (StringUtils.isNotBlank(searchText)) {
             builder.add("userName", Operator.likeAll.name(), searchText);
         }
-        Page<Memorandum> page = memorandumService.findAll(builder.generateSpecification(), getPageRequest(request));
-        log.info("Memorandum: {}", page.getSize());
-        return Mono.just(page);
+        Mono<Page<Memorandum>> page = memorandumService.findAll(builder.generateSpecification(), getPageRequest(request));
+        return page.map(p -> {
+            log.info("Memorandum: {}", p.getSize());
+            return p;
+        });
     }
 
     /**
@@ -67,7 +69,7 @@ public class MemorandumController extends BaseController {
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable Integer id, ModelMap map) {
         try {
-            memorandumService.delete(id);
+            memorandumService.delete(id).subscribe();
             log.info("删除: {} 成功", id);
         } catch (Exception e) {
             e.printStackTrace();

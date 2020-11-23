@@ -29,9 +29,8 @@ public class Vcodecontroller {
     public Mono<Boolean> isTrue(@RequestParam("vcode") String vcode) {
         boolean result = false;
         log.info("前台验证码: " + vcode);
-        if (vcode == null || vcode == "") {
+        if (vcode == null || vcode.equals("")) {
             return Mono.just(result);
-
         }
         String rcode = redisService.get("_code");
         // 转化成小写字母

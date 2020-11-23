@@ -4,9 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 系统服务层基接口
@@ -16,40 +17,40 @@ import java.util.List;
  */
 public interface IBaseService<T, ID extends Serializable> {
 
-    T find(ID id);
+    Mono<T> find(ID id);
 
-    List<T> findAll();
+    Flux<T> findAll();
 
-    List<T> findList(ID[] ids);
+    Flux<T> findList(ID[] ids);
 
-    List<T> findList(Iterable<ID> ids);
+    Flux<T> findList(Iterable<ID> ids);
 
-    Page<T> findAll(Pageable pageable);
+    Mono<Page<T>> findAll(Pageable pageable);
 
-    Page<T> findAll(Specification<T> spec, Pageable pageable);
+    Mono<Page<T>> findAll(Specification<T> spec, Pageable pageable);
 
-    long count();
+    Mono<Long> count();
 
-    long count(Specification<T> spec);
+    Mono<Long> count(Specification<T> spec);
 
-    boolean exists(ID id);
+    Mono<Boolean> exists(ID id);
 
-    void save(T entity);
+    Mono<T> save(T entity);
 
-    T update(T entity);
+    Mono<T> update(T entity);
 
-    void delete(ID id);
+    Mono<Boolean> delete(ID id);
 
-    void deleteByIds(@SuppressWarnings("unchecked") ID... ids);
+    Mono<Void> deleteByIds(@SuppressWarnings("unchecked") ID... ids);
 
-    void delete(T[] entitys);
+    Mono<Void> delete(T[] entitys);
 
-    void delete(Iterable<T> entitys);
+    Mono<Void> delete(Iterable<T> entitys);
 
-    void delete(T entity);
+    Mono<Void> delete(T entity);
 
     /**
      * 返回list的全部分页查询
      */
-    List<T> findList(Specification<T> spec, Sort sort);// List<T>是ArrayList类的泛型等效类，该类使用大小可按需动态增加的数组实现IList<T>泛型接口
+    Flux<T> findList(Specification<T> spec, Sort sort);// List<T>是ArrayList类的泛型等效类，该类使用大小可按需动态增加的数组实现IList<T>泛型接口
 }

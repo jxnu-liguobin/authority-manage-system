@@ -144,7 +144,7 @@
             		maxlength:"姓名最多10位"
             	},
             	password1:{
-            		minlength:"密码最少5位",
+            		minlength:"密码最少6位",
             		maxlength:"密码最多20位"
             	}
             		

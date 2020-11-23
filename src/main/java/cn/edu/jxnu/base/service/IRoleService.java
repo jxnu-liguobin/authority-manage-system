@@ -1,6 +1,7 @@
 package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.Role;
+import reactor.core.publisher.Mono;
 
 /**
  * 角色服务接口
@@ -13,16 +14,18 @@ public interface IRoleService extends IBaseService<Role, Integer> {
     /**
      * 添加或者修改角色
      *
-     * @param role</br>
+     * @param role
+     * @return
      */
-    void saveOrUpdate(Role role);
+    Mono<Role> saveOrUpdate(Role role);
 
     /**
      * 给角色分配资源
      *
+     * @param resourceIds
      * @param id
-     * @param resourceIds</br>
+     * @return
      */
-    void grant(Integer id, String[] resourceIds);
+    Mono<Role> grant(Integer id, String[] resourceIds);
 
 }

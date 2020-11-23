@@ -38,7 +38,7 @@ public class MemorandumUtils {
                         return memorandumService;
                 } catch (InterruptedException ignored) {
                 }
-                log.error("缺少IMemorandumService,等待20ms 第{}次", 3 - i);
+                log.error("缺少IMemorandumService，等待20ms 第{}次", 3 - i);
                 if (3 - i == 3) {
                     throw new NullPointerException("缺少IMemorandumService");
                 }
@@ -60,7 +60,7 @@ public class MemorandumUtils {
     public synchronized final void saveMemorandum(MemorandumUtils memorandumUtils, String usercode, String userName,
                                                   String type) {
         Memorandum m = new Memorandum(0, new Date(), usercode, userName, type + " | " + usercode);
-        log.info("保存操作记录:{}", m.toString());
+        log.info("保存操作记录: {}", m.toString());
         memorandumUtils.instance().save(m);
     }
 
@@ -74,7 +74,7 @@ public class MemorandumUtils {
     public synchronized final void saveMemorandum(MemorandumUtils memorandumUtils, String usercode, String userName,
                                                   String type, String ucode) {
         Memorandum m = new Memorandum(0, new Date(), usercode, userName, type + " | " + ucode);
-        log.info("保存操作记录:{}", m.toString());
+        log.info("保存操作记录: {}", m.toString());
         memorandumUtils.instance().save(m);
     }
 

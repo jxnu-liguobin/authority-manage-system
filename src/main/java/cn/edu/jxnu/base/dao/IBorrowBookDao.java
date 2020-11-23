@@ -17,7 +17,7 @@ public interface IBorrowBookDao extends IBaseDao<BorrowBook, String> {
      * 根据用户查询借阅列表
      *
      * @param userId
-     * @return 借书列表</ br>
+     * @return 借书列表
      */
     BorrowBook[] findByUserId(int userId);
 
@@ -25,7 +25,7 @@ public interface IBorrowBookDao extends IBaseDao<BorrowBook, String> {
      * 根据图书查询借阅列表
      *
      * @param bookId
-     * @return 借书列表</ br>
+     * @return 借书列表
      */
     BorrowBook[] findByBookId(String bookId);
 
@@ -34,7 +34,7 @@ public interface IBorrowBookDao extends IBaseDao<BorrowBook, String> {
      *
      * @param userId
      * @param bookId
-     * @return 一条借书记录</ br>
+     * @return 一条借书记录
      */
     BorrowBook findByUserIdAndBookId(int userId, String bookId);
 

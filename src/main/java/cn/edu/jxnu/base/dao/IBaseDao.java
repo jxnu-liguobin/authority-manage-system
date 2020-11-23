@@ -15,8 +15,5 @@ import java.io.Serializable;
  */
 @NoRepositoryBean // 启动时不实例化
 public interface IBaseDao<T extends BaseEntity, ID extends Serializable> extends JpaRepository<T, ID>, JpaSpecificationExecutor<T> {
-    /**
-     * JpaRepository支持基本的CRUD，JpaSpecificationExecutor用在复杂查询
-     */
-
+// JpaRepository支持基本的CRUD，JpaSpecificationExecutor用在复杂查询
 }

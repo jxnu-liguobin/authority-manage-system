@@ -1,6 +1,7 @@
 package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.Book;
+import reactor.core.publisher.Mono;
 
 /**
  * 图书服务接口
@@ -16,7 +17,7 @@ public interface IBookService extends IBaseService<Book, String> {
      * @param id
      * @return Book
      */
-    Book findByBookId(String id);
+    Mono<Book> findByBookId(String id);
 
     /**
      * 根据书名查图书
@@ -24,7 +25,7 @@ public interface IBookService extends IBaseService<Book, String> {
      * @param bookName
      * @return Book
      */
-    Book findByBookName(String bookName);
+    Mono<Book> findByBookName(String bookName);
 
     /**
      * 根据出版社查图书
@@ -32,7 +33,7 @@ public interface IBookService extends IBaseService<Book, String> {
      * @param bookPress
      * @return Book
      */
-    Book findByBookPress(String bookPress);
+    Mono<Book> findByBookPress(String bookPress);
 
     /**
      * 保存或更新图书信息
@@ -40,7 +41,7 @@ public interface IBookService extends IBaseService<Book, String> {
      * @param book
      * @return void
      */
-    void saveOrUpdate(Book book);
+    Mono<Book> saveOrUpdate(Book book);
 
     /**
      * 保存或更新图书信息
@@ -48,8 +49,7 @@ public interface IBookService extends IBaseService<Book, String> {
      *
      * @param book
      * @param cInventory
-     * @author 梦境迷离.
      */
-    void saveOrUpdate(Book book, Integer cInventory);
+    Mono<Book> saveOrUpdate(Book book, Integer cInventory);
 
 }
