@@ -1,13 +1,11 @@
 package cn.edu.jxnu.base.dao;
 
+import cn.edu.jxnu.base.entity.Memorandum;
 import org.springframework.stereotype.Repository;
 
-import cn.edu.jxnu.base.entity.Memorandum;
-
 /**
- * @author: 梦境迷离.
- * @version 1.0
- * @time 2018年5月1日
+ * @author 梦境迷离
+ * @version V2.0 2020年11月20日
  */
 @Repository
 public interface IMemorandumDao extends IBaseDao<Memorandum, Integer> {

@@ -1,13 +1,12 @@
 package cn.edu.jxnu.base.config.shiro.freemarker;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-
 import freemarker.core.Environment;
+import freemarker.log.Logger;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * JSP tag that renders the tag body only if the current user has executed a
@@ -30,21 +29,21 @@ import freemarker.template.TemplateException;
  * @since 0.2
  */
 public class AuthenticatedTag extends SecureTag {
-	private static final Logger log = Logger.getLogger("AuthenticatedTag");
+    private static final Logger log = Logger.getLogger("AuthenticatedTag");
 
-	@Override
-	public void render(Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body) throws IOException, TemplateException {
-		if (getSubject() != null && getSubject().isAuthenticated()) {
-			if (log.isDebugEnabled()) {
-				log.debug("Subject exists and is authenticated.  Tag body will be evaluated.");
-			}
+    @Override
+    public void render(Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body) throws IOException, TemplateException {
+        if (getSubject() != null && getSubject().isAuthenticated()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Subject exists and is authenticated.  Tag body will be evaluated.");
+            }
 
-			renderBody(env, body);
-		} else {
-			if (log.isDebugEnabled()) {
-				log.debug("Subject does not exist or is not authenticated.  Tag body will not be evaluated.");
-			}
-		}
-	}
+            renderBody(env, body);
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Subject does not exist or is not authenticated.  Tag body will not be evaluated.");
+            }
+        }
+    }
 
 }

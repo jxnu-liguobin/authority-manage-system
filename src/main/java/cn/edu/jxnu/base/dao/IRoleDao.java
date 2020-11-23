@@ -1,18 +1,15 @@
 package cn.edu.jxnu.base.dao;
 
-import org.springframework.stereotype.Repository;
-
-import cn.edu.jxnu.base.dao.IBaseDao;
 import cn.edu.jxnu.base.entity.Role;
+import org.springframework.stereotype.Repository;
 
 /**
  * 角色管理dao
- * 
+ * <p>
  * 使用默认方法
- * 
+ *
  * @author 梦境迷离
- * @time 2018年4月10日 下午5:37:50.
- * @version V1.0
+ * @version V2.0 2020年11月20日
  */
 @Repository
 public interface IRoleDao extends IBaseDao<Role, Integer> {
