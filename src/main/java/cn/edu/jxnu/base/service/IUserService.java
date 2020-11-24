@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.User;
@@ -41,5 +42,4 @@ public interface IUserService extends IBaseService<User, Integer> {
      * @param roleIds
      */
     Mono<User> grant(Integer id, String[] roleIds);
-
 }

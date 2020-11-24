@@ -1,9 +1,12 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service.impl;
 
 import cn.edu.jxnu.base.dao.IBaseDao;
 import cn.edu.jxnu.base.entity.BaseEntity;
-import cn.edu.jxnu.base.entity.User;
 import cn.edu.jxnu.base.service.IBaseService;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,17 +14,14 @@ import org.springframework.data.jpa.domain.Specification;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * 系统基接口服务层实现
  *
  * @author 梦境迷离
  * @version V2.0 2020年11月20日
  */
-public abstract class BaseServiceImpl<T extends BaseEntity, ID extends Serializable> implements IBaseService<T, ID> {
+public abstract class BaseServiceImpl<T extends BaseEntity, ID extends Serializable>
+        implements IBaseService<T, ID> {
 
     public abstract IBaseDao<T, ID> baseDao();
 
@@ -123,5 +123,4 @@ public abstract class BaseServiceImpl<T extends BaseEntity, ID extends Serializa
     public Mono<Page<T>> findAll(Specification<T> spec, Pageable pageable) {
         return Mono.justOrEmpty(baseDao().findAll(spec, pageable));
     }
-
 }

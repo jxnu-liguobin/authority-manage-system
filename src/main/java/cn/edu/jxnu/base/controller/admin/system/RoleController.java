@@ -1,13 +1,15 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.controller.admin.system;
 
 import cn.edu.jxnu.base.controller.BaseController;
 import cn.edu.jxnu.base.entity.Role;
 import cn.edu.jxnu.base.service.IRoleService;
 import cn.edu.jxnu.base.service.IUserService;
+import cn.edu.jxnu.base.service.component.MemorandumComponent;
 import cn.edu.jxnu.base.service.specification.SimpleSpecificationBuilder;
 import cn.edu.jxnu.base.service.specification.SpecificationOperator.Operator;
 import cn.edu.jxnu.base.utils.JsonResult;
-import cn.edu.jxnu.base.utils.MemorandumUtils;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,8 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 系统角色控制类
@@ -28,30 +28,23 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/admin/role")
 public class RoleController extends BaseController {
 
-    @Autowired
-    private IRoleService roleService;
+    @Autowired private IRoleService roleService;
 
-    @Autowired
-    private MemorandumUtils memorandumUtils;
+    @Autowired private MemorandumComponent memorandumComponent;
 
-    @Autowired
-    private IUserService userService;
+    @Autowired private IUserService userService;
 
-    /**
-     * 打开角色管理首页页面
-     */
+    /** 打开角色管理首页页面 */
     @RequestMapping(value = {"/", "/index"})
     public String index() {
         return "admin/role/index";
     }
 
-    /**
-     * 角色管理分页
-     */
+    /** 角色管理分页 */
     @RequestMapping(value = {"/list"})
     @ResponseBody
     public Mono<Page<Role>> list(HttpServletRequest request) {
-        SimpleSpecificationBuilder<Role> builder = new SimpleSpecificationBuilder<Role>();
+        SimpleSpecificationBuilder<Role> builder = new SimpleSpecificationBuilder<>();
         String searchText = request.getParameter("searchText");
         if (StringUtils.isNotBlank(searchText)) {
             builder.add("name", Operator.likeAll.name(), searchText);
@@ -60,9 +53,7 @@ public class RoleController extends BaseController {
         return roleService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
-    /**
-     * 打开添加角色页面
-     */
+    /** 打开添加角色页面 */
     @RequestMapping(value = "/add")
     public String add(ModelMap map) {
         Role role = new Role();
@@ -84,44 +75,48 @@ public class RoleController extends BaseController {
         return "admin/role/form";
     }
 
-    /**
-     * 添加或修改角色
-     */
-    @RequestMapping(value = {"/edit"}, method = RequestMethod.POST)
+    /** 添加或修改角色 */
+    @RequestMapping(
+            value = {"/edit"},
+            method = RequestMethod.POST)
     @ResponseBody
-    public Mono<JsonResult> edit(Role role, ModelMap map, @RequestParam("uCode") String uCode) {
-        try {
-            roleService.saveOrUpdate(role).subscribe();
-            userService.findByUserCode(uCode).subscribe(u -> memorandumUtils.saveMemorandum(memorandumUtils, uCode, u.getUserName(),
-                    "修改/新增角色", role.getRoleKey() + " | " + role.getName()));
-        } catch (Exception e) {
-            return Mono.just(JsonResult.failure(e.getMessage()));
-        }
+    public Mono<JsonResult> edit(Role role, @RequestParam("uCode") String uCode) {
+        roleService.saveOrUpdate(role).subscribe();
+        userService
+                .findByUserCode(uCode)
+                .subscribe(
+                        u ->
+                                memorandumComponent.saveMemorandum(
+                                        uCode,
+                                        u.getUserName(),
+                                        "修改/新增角色",
+                                        role.getRoleKey() + " | " + role.getName()));
         return Mono.just(JsonResult.success());
     }
 
-    /**
-     * 删除角色
-     */
+    /** 删除角色 */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
-    public Mono<JsonResult> delete(@PathVariable Integer id, ModelMap map, @RequestParam("uCode") String uCode) {
-        try {
-            userService.findByUserCode(uCode).subscribe(u -> roleService.find(id).subscribe(r -> {
-                memorandumUtils.saveMemorandum(memorandumUtils, uCode, u.getUserName(),
-                        "删除角色", r.getRoleKey() + " | " + r.getName());
-                roleService.delete(id).subscribe();
-            }));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Mono.just(JsonResult.failure(e.getMessage()));
-        }
+    public Mono<JsonResult> delete(@PathVariable Integer id, @RequestParam("uCode") String uCode) {
+        userService
+                .findByUserCode(uCode)
+                .subscribe(
+                        u ->
+                                roleService
+                                        .find(id)
+                                        .subscribe(
+                                                r -> {
+                                                    memorandumComponent.saveMemorandum(
+                                                            uCode,
+                                                            u.getUserName(),
+                                                            "删除角色",
+                                                            r.getRoleKey() + " | " + r.getName());
+                                                    roleService.delete(id).subscribe();
+                                                }));
         return Mono.just(JsonResult.success());
     }
 
-    /**
-     * 打开授权页面
-     */
+    /** 打开授权页面 */
     @RequestMapping(value = "/grant/{id}")
     public String grant(@PathVariable Integer id, ModelMap map) {
         Mono<Role> role = roleService.find(id);
@@ -129,19 +124,12 @@ public class RoleController extends BaseController {
         return "admin/role/grant";
     }
 
-    /**
-     * 授权
-     */
+    /** 授权 */
     @RequestMapping(value = "/grant/{id}", method = RequestMethod.POST)
     @ResponseBody
-    public Mono<JsonResult> grant(@PathVariable Integer id, @RequestParam(required = false) String[] resourceIds,
-                                  ModelMap map) {
-        try {
-            roleService.grant(id, resourceIds).subscribe();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Mono.just(JsonResult.failure(e.getMessage()));
-        }
+    public Mono<JsonResult> grant(
+            @PathVariable Integer id, @RequestParam(required = false) String[] resourceIds) {
+        roleService.grant(id, resourceIds).subscribe();
         return Mono.just(JsonResult.success());
     }
 }

@@ -1,9 +1,12 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.config;
 
 import cn.edu.jxnu.base.config.intercepter.CommonIntercepter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +19,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * SpringBoot自定义的web配置
  *
@@ -28,8 +28,7 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
-    @Autowired
-    private CommonIntercepter commonIntercepter;
+    @Autowired private CommonIntercepter commonIntercepter;
 
     /**
      * fastJson相关设置
@@ -45,8 +44,8 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         serializerFeatureList.add(SerializerFeature.WriteNullStringAsEmpty);
         serializerFeatureList.add(SerializerFeature.WriteNullListAsEmpty);
         serializerFeatureList.add(SerializerFeature.DisableCircularReferenceDetect);
-        SerializerFeature[] serializerFeatures = serializerFeatureList
-                .toArray(new SerializerFeature[serializerFeatureList.size()]);
+        SerializerFeature[] serializerFeatures =
+                serializerFeatureList.toArray(new SerializerFeature[serializerFeatureList.size()]);
         fastJsonConfig.setSerializerFeatures(serializerFeatures);
 
         return fastJsonConfig;
@@ -59,7 +58,8 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
      */
     private FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter() {
 
-        FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter4();
+        FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter =
+                new FastJsonHttpMessageConverter4();
         List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
         supportedMediaTypes.add(MediaType.parseMediaType("text/html;charset=UTF-8"));
         supportedMediaTypes.add(MediaType.parseMediaType("application/json"));
@@ -91,8 +91,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     }
 
     /**
-     * Spring
-     * 提供了FilterRegistrationBean类，此类提供setOrder方法，可以为filter设置排序值，让spring在注册web
+     * Spring 提供了FilterRegistrationBean类，此类提供setOrder方法，可以为filter设置排序值，让spring在注册web
      * filter之前排序后再依次注册。
      *
      * @return FilterRegistrationBean
@@ -106,9 +105,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return registration;
     }
 
-    /**
-     * 域名直接访问主页
-     */
+    /** 域名直接访问主页 */
     public static String LOGIN_USER = "loginUser";
 
     @Override

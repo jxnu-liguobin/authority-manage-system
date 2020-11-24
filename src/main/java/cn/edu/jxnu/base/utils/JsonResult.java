@@ -1,8 +1,8 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.utils;
 
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 /**
  * Json 统一返回消息类
@@ -14,30 +14,18 @@ import java.io.Serializable;
 public class JsonResult implements Serializable {
 
     private static final long serialVersionUID = -1491499610244557029L;
-    /**
-     * 成功代码
-     */
+    /** 成功代码 */
     public static int CODE_SUCCESS = 0;
-    /**
-     * 失败代码
-     */
+    /** 失败代码 */
     public static int CODE_FAILURED = -1;
-    /**
-     * 携带数据
-     */
-    public static String[] NOOP = new String[]{};
+    /** 携带数据 */
+    public static String[] NOOP = new String[] {};
 
-    /**
-     * 处理状态：0: 成功
-     */
+    /** 处理状态：0: 成功 */
     private int code;
-    /**
-     * 返回消息
-     */
+    /** 返回消息 */
     private String message;
-    /**
-     * 返回数据
-     */
+    /** 返回数据 */
     private Object data;
 
     /**
@@ -86,7 +74,7 @@ public class JsonResult implements Serializable {
      * 处理成功
      *
      * @param message 消息
-     * @param data    数据对象
+     * @param data 数据对象
      * @return data
      */
     public static JsonResult success(String message, Object data) {
@@ -96,7 +84,7 @@ public class JsonResult implements Serializable {
     /**
      * 处理失败，并返回数据（一般为错误信息）
      *
-     * @param code    错误代码
+     * @param code 错误代码
      * @param message 消息
      * @return data
      */
@@ -123,5 +111,4 @@ public class JsonResult implements Serializable {
     public String toString() {
         return "JsonResult [code=" + code + ", message=" + message + ", data=" + data + "]";
     }
-
 }

@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.dao;
 
 import cn.edu.jxnu.base.entity.BorrowBook;
@@ -38,11 +39,8 @@ public interface IBorrowBookDao extends IBaseDao<BorrowBook, String> {
      */
     BorrowBook findByUserIdAndBookId(int userId, String bookId);
 
-    /**
-     * 事务删除或修改操作，不支持新增/插入
-     */
+    /** 事务删除或修改操作，不支持新增/插入 */
     @Modifying
     @Query("DELETE FROM BorrowBook b WHERE b.userId = ?1 and b.bookId= ?2")
     void mDelet(int userId, String bookId);
-
 }

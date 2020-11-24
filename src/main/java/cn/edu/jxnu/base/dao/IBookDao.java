@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.dao;
 
 import cn.edu.jxnu.base.entity.Book;
@@ -35,5 +36,4 @@ public interface IBookDao extends IBaseDao<Book, String> {
      * @return 图书
      */
     Book findByBookPress(String bookPress);
-
 }

@@ -1,9 +1,9 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.entity;
 
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
 
 /**
  * ztree树
@@ -17,25 +17,15 @@ public class ZtreeView implements Serializable {
 
     private static final long serialVersionUID = 6237809780035784312L;
 
-    /**
-     * id
-     */
+    /** id */
     private Long id;
-    /**
-     * 父id
-     */
+    /** 父id */
     private Long pId;
-    /**
-     * 名称
-     */
+    /** 名称 */
     private String name;
-    /**
-     * 是否展开
-     */
+    /** 是否展开 */
     private boolean open;
-    /**
-     * 是否已点击，默认false
-     */
+    /** 是否已点击，默认false */
     private boolean checked = false;
 
     public ZtreeView(Long id, Long pId, String name, boolean open) {
@@ -46,11 +36,9 @@ public class ZtreeView implements Serializable {
         this.open = open;
     }
 
-    public ZtreeView() {
-    }
+    public ZtreeView() {}
 
     public void setpId(long l) {
         this.pId = l;
     }
-
 }

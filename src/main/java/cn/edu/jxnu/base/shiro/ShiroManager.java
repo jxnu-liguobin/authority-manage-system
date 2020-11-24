@@ -1,4 +1,5 @@
-package cn.edu.jxnu.base.config.shiro;
+/* 梦境迷离 (C)2020 */
+package cn.edu.jxnu.base.shiro;
 
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -27,17 +28,15 @@ public class ShiroManager {
         return new LifecycleBeanPostProcessor();
     }
 
-    /**
-     * @return DefaultAdvisorAutoProxyCreator
-     */
+    /** @return DefaultAdvisorAutoProxyCreator */
     @Bean(name = "defaultAdvisorAutoProxyCreator")
     @ConditionalOnMissingBean
     @DependsOn("lifecycleBeanPostProcessor")
     public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
-        DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
+        DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator =
+                new DefaultAdvisorAutoProxyCreator();
         defaultAdvisorAutoProxyCreator.setProxyTargetClass(true);
         return defaultAdvisorAutoProxyCreator;
-
     }
 
     /**

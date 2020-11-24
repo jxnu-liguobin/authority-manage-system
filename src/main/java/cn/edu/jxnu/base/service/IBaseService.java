@@ -1,13 +1,13 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service;
 
+import java.io.Serializable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * 系统服务层基接口
@@ -49,8 +49,8 @@ public interface IBaseService<T, ID extends Serializable> {
 
     Mono<Void> delete(T entity);
 
-    /**
-     * 返回list的全部分页查询
-     */
-    Flux<T> findList(Specification<T> spec, Sort sort);// List<T>是ArrayList类的泛型等效类，该类使用大小可按需动态增加的数组实现IList<T>泛型接口
+    /** 返回list的全部分页查询 */
+    Flux<T> findList(
+            Specification<T> spec,
+            Sort sort); // List<T>是ArrayList类的泛型等效类，该类使用大小可按需动态增加的数组实现IList<T>泛型接口
 }

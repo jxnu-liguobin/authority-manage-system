@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.redis;
 
 import java.util.List;
@@ -41,18 +42,14 @@ public interface RedisService {
     Map<Integer, List<String>> hashGetAll(String key) throws Exception;
 
     /**
-     * <p>
-     * 哈希表 hKey 中的域 hashKey 的值加上增量 delta 。 增量也可以为负数，相当于对给定域进行减法操作。 如果 key
-     * 不存在，一个新的哈希表被创建并执行 HINCRBY 命令。 如果域 field 不存在，那么在执行命令前，域的值被初始化为 0 。 对一个储存字符串值的域
-     * field 执行 HINCRBY 命令将造成一个错误。
-     * </p>
+     * 哈希表 hKey 中的域 hashKey 的值加上增量 delta 。 增量也可以为负数，相当于对给定域进行减法操作。 如果 key 不存在，一个新的哈希表被创建并执行 HINCRBY
+     * 命令。 如果域 field 不存在，那么在执行命令前，域的值被初始化为 0 。 对一个储存字符串值的域 field 执行 HINCRBY 命令将造成一个错误。
      *
      * @time 2018年4月10日 下午9:47:35
      * @version V1.0
      * @param hKey
      * @param hashKey
-     * @param i
-     *            指定的增量
+     * @param i 指定的增量
      * @return 返回 hashKey的value增加之后 的值
      */
     // Long hashIncrementLongOfHashMap(String hKey, Integer hashKey, Integer i);
@@ -114,5 +111,4 @@ public interface RedisService {
      * @param value
      */
     void set(String key, String value);
-
 }

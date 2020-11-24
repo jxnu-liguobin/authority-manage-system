@@ -1,14 +1,14 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service.impl;
 
 import cn.edu.jxnu.base.dao.IBaseDao;
 import cn.edu.jxnu.base.dao.IBorrowBookDao;
 import cn.edu.jxnu.base.entity.BorrowBook;
 import cn.edu.jxnu.base.service.IBorrowBookService;
+import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 
 /**
  * 借阅服务实现类
@@ -19,14 +19,14 @@ import javax.transaction.Transactional;
 @Service
 @Slf4j
 @Transactional
-public class BorrowBookServiceImpl extends BaseServiceImpl<BorrowBook, String> implements IBorrowBookService {
+public class BorrowBookServiceImpl extends BaseServiceImpl<BorrowBook, String>
+        implements IBorrowBookService {
 
-    @Autowired
-    private IBorrowBookDao borrowBookDao;
+    @Autowired private IBorrowBookDao borrowBookDao;
 
     @Override
     public BorrowBook[] findByUserId(int userId) {
-        log.info("findByUserId:" + userId);
+        log.info("findByUserId: " + userId);
         return borrowBookDao.findByUserId(userId);
     }
 
@@ -38,9 +38,8 @@ public class BorrowBookServiceImpl extends BaseServiceImpl<BorrowBook, String> i
 
     @Override
     public void saveOrUpdate(BorrowBook borrowBook) {
-        log.info("saveOrUpdate:" + borrowBook.toString());
-        save(borrowBook);
-
+        log.info("saveOrUpdate:  " + borrowBook.toString());
+        save(borrowBook).subscribe();
     }
 
     @Override
@@ -50,14 +49,13 @@ public class BorrowBookServiceImpl extends BaseServiceImpl<BorrowBook, String> i
 
     @Override
     public BorrowBook findByUserIdAndBookId(int userId, String bookId) {
-        log.info("findByUserIdAndBookId:" + userId + "-" + bookId);
+        log.info("findByUserIdAndBookId: " + userId + " - " + bookId);
         return borrowBookDao.findByUserIdAndBookId(userId, bookId);
     }
 
     @Override
     public void deletByUserIdAndBookId(int userId, String bookId) {
-        log.info("deletByUserIdAndBookId:" + userId + "-" + bookId);
+        log.info("deletByUserIdAndBookId: " + userId + " - " + bookId);
         borrowBookDao.mDelet(userId, bookId);
     }
-
 }

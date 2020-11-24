@@ -93,7 +93,7 @@
    if (edit=="noCheck") {
 	   url="${ctx!}/admin/user/isAllTrue"
    } else {
-	   url='${ctx!}/admin/user/isExist'
+	   url='${ctx!}/admin/user/notExist'
    }
     $(document).ready(function () {
     	/**添加手机号码验证*/

@@ -1,10 +1,10 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service.specification;
 
 import cn.edu.jxnu.base.service.specification.SpecificationOperator.Join;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
  * 查询构建类
@@ -14,9 +14,7 @@ import java.util.List;
  */
 public class SimpleSpecificationBuilder<T> {
 
-    /**
-     * 条件列表
-     */
+    /** 条件列表 */
     private List<SpecificationOperator> opers;
 
     /**

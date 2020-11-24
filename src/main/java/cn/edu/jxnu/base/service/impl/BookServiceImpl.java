@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service.impl;
 
 import cn.edu.jxnu.base.dao.IBaseDao;
@@ -5,14 +6,13 @@ import cn.edu.jxnu.base.dao.IBookDao;
 import cn.edu.jxnu.base.entity.Book;
 import cn.edu.jxnu.base.service.IBookService;
 import cn.edu.jxnu.base.utils.UUIDUtils;
+import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import javax.transaction.Transactional;
 
 /**
  * 图书服务层实现
@@ -27,8 +27,7 @@ public class BookServiceImpl extends BaseServiceImpl<Book, String> implements IB
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private IBookDao bookDao;
+    @Autowired private IBookDao bookDao;
 
     @Override
     public IBaseDao<Book, String> baseDao() {
@@ -62,26 +61,27 @@ public class BookServiceImpl extends BaseServiceImpl<Book, String> implements IB
             book.setCurrentInventory(book.getBookInventory());
             return save(book);
         } else {
-            Mono<Book> mBookMono = findByBookId(book.getBookId());
-            return mBookMono.map(mBook -> {
-                mBook.setBookName(book.getBookName());
-                mBook.setBookAuthor(book.getBookAuthor());
-                mBook.setBookPress(book.getBookPress());
-                mBook.setBookInventory(book.getBookInventory());
+            return findByBookId(book.getBookId())
+                    .map(
+                            mBook -> {
+                                mBook.setBookName(book.getBookName());
+                                mBook.setBookAuthor(book.getBookAuthor());
+                                mBook.setBookPress(book.getBookPress());
+                                mBook.setBookInventory(book.getBookInventory());
 
-                // 这里需要在库存增加的时候增加可用库存
-                int temp = book.getBookInventory() - cInventory;
-                log.info("当前库存差：" + temp);
-                int oldInventoryTemp = cInventory - book.getCurrentInventory();// 原有库存-可用
-                if (book.getBookInventory() < oldInventoryTemp) {
-                    throw new RuntimeException("库存量不能小于已借出数量");
-                }
-                mBook.setCurrentInventory(temp + book.getCurrentInventory());
-                update(mBook).subscribe();
-                return mBook;
-            });
+                                // 这里需要在库存增加的时候增加可用库存
+                                int temp = book.getBookInventory() - cInventory;
+                                log.info("当前库存差：" + temp);
+                                int oldInventoryTemp =
+                                        cInventory - book.getCurrentInventory(); // 原有库存-可用
+                                if (book.getBookInventory() < oldInventoryTemp) {
+                                    throw new RuntimeException("库存量不能小于已借出数量");
+                                }
+                                mBook.setCurrentInventory(temp + book.getCurrentInventory());
+                                update(mBook).subscribe();
+                                return mBook;
+                            });
         }
-
     }
 
     @Override
@@ -92,19 +92,18 @@ public class BookServiceImpl extends BaseServiceImpl<Book, String> implements IB
             book.setCurrentInventory(book.getBookInventory());
             return save(book);
         } else {
-            Mono<Book> mBookMono = findByBookId(book.getBookId());
-            return mBookMono.map(mBook -> {
-                mBook.setBookName(book.getBookName());
-                mBook.setBookAuthor(book.getBookAuthor());
-                mBook.setBookPress(book.getBookPress());
-                mBook.setBookInventory(book.getBookInventory());
-                // 这里需要在库存增加的时候增加可用库存
-                mBook.setCurrentInventory(book.getCurrentInventory());
-                update(mBook).subscribe();
-                return mBook;
-            });
+            return findByBookId(book.getBookId())
+                    .map(
+                            mBook -> {
+                                mBook.setBookName(book.getBookName());
+                                mBook.setBookAuthor(book.getBookAuthor());
+                                mBook.setBookPress(book.getBookPress());
+                                mBook.setBookInventory(book.getBookInventory());
+                                // 这里需要在库存增加的时候增加可用库存
+                                mBook.setCurrentInventory(book.getCurrentInventory());
+                                update(mBook).subscribe();
+                                return mBook;
+                            });
         }
-
     }
-
 }

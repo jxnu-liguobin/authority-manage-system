@@ -1,10 +1,10 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.entity;
 
+import java.util.Date;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import javax.persistence.*;
-import java.util.Date;
 
 /**
  * 借书表
@@ -20,43 +20,28 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 public class BorrowBook extends BaseEntity {
 
-    /**
-     *
-     */
+    /** */
     private static final long serialVersionUID = -7107955948085904241L;
 
-    /**
-     * 用户id
-     */
+    /** 用户id */
     @Id
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    /**
-     * 图书id
-     */
+    /** 图书id */
     @Id
     @Column(name = "book_id", nullable = false)
     private String bookId;
 
-    /**
-     * 图书名
-     */
+    /** 图书名 */
     private String bookName;
 
-    /**
-     * 作者
-     */
+    /** 作者 */
     private String bookAuthor;
 
-    /**
-     * 出版社
-     */
+    /** 出版社 */
     private String bookPress;
 
-    /**
-     * 更新时间
-     */
+    /** 更新时间 */
     private Date updateTime;
-
 }

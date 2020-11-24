@@ -1,14 +1,14 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.scheduler;
 
-import cn.edu.jxnu.base.config.shiro.RetryLimitHashedCredentialsMatcher;
+import cn.edu.jxnu.base.shiro.RetryLimitHashedCredentialsMatcher;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 定时任务 改
@@ -20,16 +20,13 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class Scheduler {
 
-    @Autowired
-    private RetryLimitHashedCredentialsMatcher credentialsMatcher;
+    @Autowired private RetryLimitHashedCredentialsMatcher credentialsMatcher;
     // public static volatile ConcurrentLinkedDeque<String> list = new
     // ConcurrentLinkedDeque<String>();
     public static volatile ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<>();
     public static ReentrantLock lock = new ReentrantLock();
 
-    /**
-     * ehcache的缓存过期无效，使用定时任务替代。
-     */
+    /** ehcache的缓存过期无效，使用定时任务替代。 */
     @Scheduled(fixedRate = 60000) // 完成之后的每分钟执行一次,即存在误差1分钟，可以控制fixedRate
     public void statusCheck() {
         try {
@@ -37,16 +34,17 @@ public class Scheduler {
             log.info("每分钟执行一次。开始……");
             // 添加到阻塞双端队列
             // string = list.pollFirst();
-            map.forEach((x, y) -> {
-                if (credentialsMatcher.getPasswordRetryCache().get(x) != null) {
-                    long temp = System.currentTimeMillis() - y;
-                    if (temp >= 1000 * 60 * 10) {
-                        log.info("正在清除用户：{}的记录,锁定时间：{}", x, temp);
-                        map.remove(x);
-                        credentialsMatcher.getPasswordRetryCache().remove(x);
-                    }
-                }
-            });
+            map.forEach(
+                    (x, y) -> {
+                        if (credentialsMatcher.getPasswordRetryCache().get(x) != null) {
+                            long temp = System.currentTimeMillis() - y;
+                            if (temp >= 1000 * 60 * 10) {
+                                log.info("正在清除用户：{}的记录,锁定时间：{}", x, temp);
+                                map.remove(x);
+                                credentialsMatcher.getPasswordRetryCache().remove(x);
+                            }
+                        }
+                    });
             // if (string != null) {
             // if (credentialsMatcher.getPasswordRetryCache().get(string) !=
             // null) {
@@ -62,9 +60,7 @@ public class Scheduler {
         log.info("每分钟执行一次。结束……");
     }
 
-    /**
-     * 防止内存溢出
-     */
+    /** 防止内存溢出 */
     @Scheduled(fixedDelay = 36000000) // 完成后的每600分钟执行一次,清空
     public void checkSize() {
         log.info("开始……");

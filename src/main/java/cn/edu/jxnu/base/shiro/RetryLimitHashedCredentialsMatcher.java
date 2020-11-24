@@ -1,9 +1,11 @@
-package cn.edu.jxnu.base.config.shiro;
+/* 梦境迷离 (C)2020 */
+package cn.edu.jxnu.base.shiro;
 
 import cn.edu.jxnu.base.scheduler.Scheduler;
 import cn.edu.jxnu.base.service.IUserService;
 import cn.edu.jxnu.base.utils.Constats;
 import cn.edu.jxnu.base.utils.MD5Utils;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -16,8 +18,6 @@ import org.apache.shiro.cache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * 独立的密码验证工具
  *
@@ -28,8 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class RetryLimitHashedCredentialsMatcher extends HashedCredentialsMatcher {
 
-    @Autowired
-    private IUserService userService;
+    @Autowired private IUserService userService;
 
     private Cache<String, AtomicInteger> passwordRetryCache;
 
@@ -48,7 +47,7 @@ public class RetryLimitHashedCredentialsMatcher extends HashedCredentialsMatcher
         // info中的密码是从数据库中获取的password。
         // info第三个字段是realm，即当前realm的名称。
         log.info("进入密码验证" + getHashAlgorithmName() + getHashIterations());
-        String userCode = (String) token.getPrincipal();// 用户名
+        String userCode = (String) token.getPrincipal(); // 用户名
         AtomicInteger retryCount = passwordRetryCache.get(userCode);
         if (retryCount == null) {
             log.info(userCode + ":第一次尝试，存放进缓存");
@@ -71,12 +70,16 @@ public class RetryLimitHashedCredentialsMatcher extends HashedCredentialsMatcher
         // boolean matches = super.doCredentialsMatch(token, info);
         // 有问题，这里可能是因为加密的MD5不同，所以没用，自定义md5()实现是：toString(32).toUpperCase()
         SecurityUtils.getSubject().getSession().setTimeout(1000 * 60 * 10);
-        userService.findByUserCode(userCode).subscribe(user -> {
-            SecurityUtils.getSubject().getSession().setAttribute(Constats.CURRENTUSER + user.getId(), user);
-        });
+        userService
+                .findByUserCode(userCode)
+                .subscribe(
+                        user -> {
+                            SecurityUtils.getSubject()
+                                    .getSession()
+                                    .setAttribute(Constats.CURRENTUSER + user.getId(), user);
+                        });
         log.info("登录成功，去除缓存");
-        if (passwordRetryCache.get(userCode) != null)
-            passwordRetryCache.remove(userCode);
+        if (passwordRetryCache.get(userCode) != null) passwordRetryCache.remove(userCode);
         // if (Scheduler.list.contains(userCode)) {
         // Scheduler.list.remove(userCode);
         // }
@@ -85,9 +88,7 @@ public class RetryLimitHashedCredentialsMatcher extends HashedCredentialsMatcher
         return true;
     }
 
-    /**
-     * @return Cache
-     */
+    /** @return Cache */
     public Cache<String, AtomicInteger> getPasswordRetryCache() {
         return passwordRetryCache;
     }

@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service.impl;
 
 import cn.edu.jxnu.base.dao.IBaseDao;
@@ -9,17 +10,16 @@ import cn.edu.jxnu.base.service.IBorrowBookService;
 import cn.edu.jxnu.base.service.IRoleService;
 import cn.edu.jxnu.base.service.IUserService;
 import cn.edu.jxnu.base.utils.MD5Utils;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
-
-import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 用户服务实现类
@@ -32,14 +32,11 @@ import java.util.Set;
 @Transactional
 public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements IUserService {
 
-    @Autowired
-    private IUserDao userDao;
+    @Autowired private IUserDao userDao;
 
-    @Autowired
-    private IRoleService roleService;
+    @Autowired private IRoleService roleService;
 
-    @Autowired
-    private IBorrowBookService borrowBookService;
+    @Autowired private IBorrowBookService borrowBookService;
 
     @Override
     public IBaseDao<User, Integer> baseDao() {
@@ -59,24 +56,25 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements I
     }
 
     @Override
-    public Mono<User> saveOrUpdate(User user) {
+    public Mono<User> saveOrUpdate(final User user) {
         log.info("saveOrUpdate: " + user);
         if (user.getId() != null) {
-            Mono<User> dbUserMono = find(user.getId());
-            return dbUserMono.map(dbUser -> {
-                dbUser.setUserName(user.getUserName());
-                //20是前端的密码最大长度，考虑不周
-                if (user.getPassword().length() < 20) {
-                    //避免二次加密
-                    dbUser.setPassword(MD5Utils.md5(user.getPassword()));
-                }
-                dbUser.setTelephone(user.getTelephone());
-                dbUser.setLocked(user.getLocked());
-                dbUser.setUpdateTime(new Date());
-                log.info("userinfo: " + user.toString());
-                update(dbUser).subscribe();
-                return dbUser;
-            });
+            return find(user.getId())
+                    .map(
+                            dbUser -> {
+                                dbUser.setUserName(user.getUserName());
+                                // 20是前端的密码最大长度，考虑不周
+                                if (user.getPassword().length() < 20) {
+                                    // 避免二次加密
+                                    dbUser.setPassword(MD5Utils.md5(user.getPassword()));
+                                }
+                                dbUser.setTelephone(user.getTelephone());
+                                dbUser.setLocked(user.getLocked());
+                                dbUser.setUpdateTime(new Date());
+                                log.info("userinfo: " + user.toString());
+                                update(dbUser).subscribe();
+                                return dbUser;
+                            });
         } else {
             user.setCreateTime(new Date());
             user.setUpdateTime(new Date());
@@ -101,25 +99,25 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements I
     @Override
     public Mono<Boolean> delete(Integer id) {
         log.info("delete: " + id);
-        Mono<User> userMono = find(id);
-        return userMono.map(user -> {
-            // false抛异常
-            // Assert.state(user.getDeleteStatus() == 0, "已删除用户不可重复删除");
-            Assert.state(!"admin".equals(user.getUserName()), "超级管理员用户不能删除");
-            // super.delete(id);
-            if (user.getDeleteStatus() == 1) {
-                BorrowBook[] u = borrowBookService.findByUserId(id);
-                // 用户借过书，不允许直接删除信息。
-                Assert.state((u.length == 0), "用户还有借书记录，请还书后操作");
-                // 已被删除的，此次将真的删除。
-                delete(user);
-            } else {
-                // 置位1
-                user.setDeleteStatus(1);
-                update(user);
-            }
-            return true;
-        });
+        return find(id).map(
+                        user -> {
+                            // false抛异常
+                            // Assert.state(user.getDeleteStatus() == 0, "已删除用户不可重复删除");
+                            Assert.state(!"admin".equals(user.getUserName()), "超级管理员用户不能删除");
+                            // super.delete(id);
+                            if (user.getDeleteStatus() == 1) {
+                                BorrowBook[] u = borrowBookService.findByUserId(id);
+                                // 用户借过书，不允许直接删除信息。
+                                Assert.state((u.length == 0), "用户还有借书记录，请还书后操作");
+                                // 已被删除的，此次将真的删除。
+                                delete(user);
+                            } else {
+                                // 置位1
+                                user.setDeleteStatus(1);
+                                update(user);
+                            }
+                            return true;
+                        });
     }
 
     /**
@@ -131,28 +129,43 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements I
     @Override
     public Mono<User> grant(Integer id, String[] roleIds) {
         log.info("grant" + id);
-        Mono<User> userMono = find(id);
-        return userMono.map(user -> {
-            Assert.notNull(user, "用户不存在");
-            Assert.state(!"admin".equals(user.getUserName()), "超级管理员用户不能修改管理角色");
-            Set<Role> roles = new HashSet<>();
-            if (roleIds != null) {
-                Arrays.stream(roleIds).forEach(x -> {
-                    // 已删除的不可分配
-                    roleService.find(Integer.parseInt(x)).subscribe(r -> {
-                        log.info("role->Id: " + r.toString());
-                        Assert.state(r.getStatus() == 0, "角色已被禁用，无法进行该操作");
-                    });
-                });
-                Arrays.stream(roleIds).forEach(x -> {
-                    Integer rid = Integer.parseInt(x);
-                    roleService.find(rid).map(roles::add).subscribe();
-                });
-            }
+        return find(id).map(
+                        user -> {
+                            Assert.notNull(user, "用户不存在");
+                            Assert.state(!"admin".equals(user.getUserName()), "超级管理员用户不能修改管理角色");
+                            Set<Role> roles = new HashSet<>();
+                            if (roleIds != null) {
+                                Arrays.stream(roleIds)
+                                        .forEach(
+                                                x -> {
+                                                    // 已删除的不可分配
+                                                    roleService
+                                                            .find(Integer.parseInt(x))
+                                                            .subscribe(
+                                                                    r -> {
+                                                                        log.info(
+                                                                                "role->Id: "
+                                                                                        + r
+                                                                                                .toString());
+                                                                        Assert.state(
+                                                                                r.getStatus() == 0,
+                                                                                "角色已被禁用，无法进行该操作");
+                                                                    });
+                                                });
+                                Arrays.stream(roleIds)
+                                        .forEach(
+                                                x -> {
+                                                    Integer rid = Integer.parseInt(x);
+                                                    roleService
+                                                            .find(rid)
+                                                            .map(roles::add)
+                                                            .subscribe();
+                                                });
+                            }
 
-            user.setRoles(roles);
-            update(user).subscribe();
-            return user;
-        });
+                            user.setRoles(roles);
+                            update(user).subscribe();
+                            return user;
+                        });
     }
 }

@@ -1,9 +1,9 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.reactive.config.EnableWebFlux;
@@ -25,5 +25,4 @@ public class Application {
         SpringApplication.run(Application.class, args);
         log.debug("启动成功");
     }
-
 }

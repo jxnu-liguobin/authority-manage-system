@@ -1,11 +1,11 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.config.intercepter;
-
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 公共拦截器
@@ -25,7 +25,8 @@ public class CommonIntercepter implements HandlerInterceptor {
      * @return true
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(
+            HttpServletRequest request, HttpServletResponse response, Object handler) {
         return true;
     }
 
@@ -38,8 +39,11 @@ public class CommonIntercepter implements HandlerInterceptor {
      * @param modelAndView
      */
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           ModelAndView modelAndView) {
+    public void postHandle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
+            ModelAndView modelAndView) {
         request.setAttribute("ctx", request.getContextPath());
     }
 
@@ -52,8 +56,9 @@ public class CommonIntercepter implements HandlerInterceptor {
      * @param ex
      */
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-
-    }
-
+    public void afterCompletion(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
+            Exception ex) {}
 }

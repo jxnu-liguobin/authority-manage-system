@@ -1,12 +1,17 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service.impl;
 
 import cn.edu.jxnu.base.dao.IBaseDao;
 import cn.edu.jxnu.base.dao.IResourceDao;
 import cn.edu.jxnu.base.entity.Resource;
-import cn.edu.jxnu.base.entity.Role;
 import cn.edu.jxnu.base.entity.ZtreeView;
 import cn.edu.jxnu.base.service.IResourceService;
 import cn.edu.jxnu.base.service.IRoleService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,12 +22,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
 /**
  * 资源服务实现类
  *
@@ -32,13 +31,12 @@ import java.util.Set;
 @Service
 @Slf4j
 @Transactional
-public class ResourceServiceImpl extends BaseServiceImpl<Resource, Integer> implements IResourceService {
+public class ResourceServiceImpl extends BaseServiceImpl<Resource, Integer>
+        implements IResourceService {
 
-    @Autowired
-    private IResourceDao resourceDao;
+    @Autowired private IResourceDao resourceDao;
 
-    @Autowired
-    private IRoleService roleService;
+    @Autowired private IRoleService roleService;
 
     @Override
     public IBaseDao<Resource, Integer> baseDao() {
@@ -50,29 +48,32 @@ public class ResourceServiceImpl extends BaseServiceImpl<Resource, Integer> impl
     public Flux<ZtreeView> tree(int roleId) {
         log.info("tree: " + roleId);
         final List<ZtreeView> resultTreeNodes = new ArrayList<>();
-        Mono<Role> r = roleService.find(roleId);
-        return r.map(role -> {
-            Set<Resource> roleResources = role.getResources();
-            resultTreeNodes.add(new ZtreeView(0L, null, "系统菜单", true));
-            ZtreeView node;
-            Sort sort = new Sort(Direction.ASC, "parent", "id", "sort");
-            List<Resource> all = resourceDao.findAll(sort);
-            for (Resource resource : all) {
-                node = new ZtreeView();
-                node.setId(Long.valueOf(resource.getId()));
-                if (resource.getParent() == null) {
-                    node.setpId(0L);
-                } else {
-                    node.setpId(Long.valueOf(resource.getParent().getId()));
-                }
-                node.setName(resource.getName());
-                if (roleResources != null && roleResources.contains(resource)) {
-                    node.setChecked(true);
-                }
-                resultTreeNodes.add(node);
-            }
-            return resultTreeNodes;
-        }).flatMapMany(Flux::fromIterable);
+        return roleService
+                .find(roleId)
+                .map(
+                        role -> {
+                            Set<Resource> roleResources = role.getResources();
+                            resultTreeNodes.add(new ZtreeView(0L, null, "系统菜单", true));
+                            ZtreeView node;
+                            Sort sort = new Sort(Direction.ASC, "parent", "id", "sort");
+                            List<Resource> all = resourceDao.findAll(sort);
+                            for (Resource resource : all) {
+                                node = new ZtreeView();
+                                node.setId(Long.valueOf(resource.getId()));
+                                if (resource.getParent() == null) {
+                                    node.setpId(0L);
+                                } else {
+                                    node.setpId(Long.valueOf(resource.getParent().getId()));
+                                }
+                                node.setName(resource.getName());
+                                if (roleResources != null && roleResources.contains(resource)) {
+                                    node.setChecked(true);
+                                }
+                                resultTreeNodes.add(node);
+                            }
+                            return resultTreeNodes;
+                        })
+                .flatMapMany(Flux::fromIterable);
     }
 
     /**
@@ -82,27 +83,27 @@ public class ResourceServiceImpl extends BaseServiceImpl<Resource, Integer> impl
      */
     @Override
     @CacheEvict(value = "resourceCache") // 清除缓存元素外
-    public Mono<Resource> saveOrUpdate(Resource resource) {
+    public Mono<Resource> saveOrUpdate(final Resource resource) {
         log.info("saveOrUpdate: " + resource.toString());
         if (resource.getId() != null) {
-            Mono<Resource> r = find(resource.getId());
-            return r.map(dbResource -> {
-                        dbResource.setUpdateTime(new Date());
-                        dbResource.setName(resource.getName());
-                        dbResource.setSourceKey(resource.getSourceKey());
-                        dbResource.setType(resource.getType());
-                        dbResource.setSourceUrl(resource.getSourceUrl());
-                        dbResource.setLevel(resource.getLevel());
-                        dbResource.setSort(resource.getSort());
-                        dbResource.setIsHide(resource.getIsHide());
-                        dbResource.setIcon(resource.getIcon());
-                        dbResource.setDescription(resource.getDescription());
-                        dbResource.setUpdateTime(new Date());
-                        dbResource.setParent(resource.getParent());
-                        update(dbResource).subscribe();
-                        return dbResource;
-                    }
-            );
+            return find(resource.getId())
+                    .map(
+                            dbResource -> {
+                                dbResource.setUpdateTime(new Date());
+                                dbResource.setName(resource.getName());
+                                dbResource.setSourceKey(resource.getSourceKey());
+                                dbResource.setType(resource.getType());
+                                dbResource.setSourceUrl(resource.getSourceUrl());
+                                dbResource.setLevel(resource.getLevel());
+                                dbResource.setSort(resource.getSort());
+                                dbResource.setIsHide(resource.getIsHide());
+                                dbResource.setIcon(resource.getIcon());
+                                dbResource.setDescription(resource.getDescription());
+                                dbResource.setUpdateTime(new Date());
+                                dbResource.setParent(resource.getParent());
+                                update(dbResource).subscribe();
+                                return dbResource;
+                            });
         } else {
             resource.setCreateTime(new Date());
             resource.setUpdateTime(new Date());

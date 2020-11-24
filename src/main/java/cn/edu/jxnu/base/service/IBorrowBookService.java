@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.BorrowBook;
@@ -47,5 +48,4 @@ public interface IBorrowBookService extends IBaseService<BorrowBook, String> {
      * @return void
      */
     void deletByUserIdAndBookId(int userId, String bookId);
-
 }

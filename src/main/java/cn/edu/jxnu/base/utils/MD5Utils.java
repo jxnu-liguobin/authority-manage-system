@@ -1,10 +1,10 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.utils;
-
-import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.springframework.util.StringUtils;
 
 /**
  * Md5加密
@@ -34,7 +34,7 @@ public class MD5Utils {
      * 对用户名密码进行Md5加密
      *
      * @param input 原文
-     * @param salt  随机数
+     * @param salt 随机数
      * @return string
      */
     public static String generatePasswordMD5(String input, String salt) {
@@ -44,13 +44,10 @@ public class MD5Utils {
         return md5(salt + md5(input));
     }
 
-    /**
-     * 修改密码
-     */
+    /** 修改密码 */
     public static void main(String[] args) {
         String passw = "111111";
         String r = MD5Utils.md5(passw);
         System.out.println(r);
     }
-
 }

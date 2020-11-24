@@ -1,12 +1,11 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.exception;
 
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 全局异常
@@ -26,12 +25,11 @@ public class NotFoundExceptionImpl implements ErrorController {
     /**
      * 404 500 处理
      *
-     * @param request
      * @param response
      * @return ModelAndView
      */
     @RequestMapping(value = ERROR_PATH)
-    public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView errorHtml(HttpServletResponse response) {
         ModelAndView mView = new ModelAndView();
         if (response.getStatus() == 404) {
             mView.setViewName("/assets/404.html");
@@ -41,5 +39,4 @@ public class NotFoundExceptionImpl implements ErrorController {
         }
         return mView;
     }
-
 }

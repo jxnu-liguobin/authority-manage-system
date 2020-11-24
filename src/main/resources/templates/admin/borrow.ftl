@@ -33,12 +33,14 @@
                         <input class="form-control" type="text" id="inputAuthor" name="inputAuthor"/>
                         <label class="control-label" for="inputPublication">出版社：</label>
                         <input class="form-control" type="text" id="inputPublication" name="inputPublication"/>
-                        <button style="margin-top: 5px;"  type="button" onclick="findBook()" id="search" class="btn btn-warning">
-                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询</button>
+                        <button style="margin-top: 5px;" type="button" onclick="findBook()" id="search"
+                                class="btn btn-warning">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询
+                        </button>
                     </form>
- 				<#if message?exists >
-				<div class="alert alert-danger">${message!}</div>
-				</#if>
+                    <#if message?exists >
+                        <div class="alert alert-danger">${message!}</div>
+                    </#if>
                 </div>
 
                 <div class="ibox-content">
@@ -201,12 +203,14 @@
        data.push(userId);
        data.push(bookId);
        //转换为json格式
-       var jsonDate=JSON.stringify(data);
+       var jsonData=JSON.stringify(data);
    	   layer.confirm('确定归还这本图书吗?', {icon: 3, title:'提示'}, function(index){
               $.ajax({
                   type: "POST",
                   dataType: "json",
-                  url: "${ctx!}/web/books/returnOneBook/" + jsonDate,
+                  contentType : 'application/json',
+                  data: jsonData,
+                  url: "${ctx!}/web/books/returnOneBook",
                   success: function(msg){
                       //每还一本书就动态将该行删除
                       var id="#"+bookId;
@@ -286,6 +290,7 @@
             $(id).remove();
         }
     }
+
 </script>
 
 </body>

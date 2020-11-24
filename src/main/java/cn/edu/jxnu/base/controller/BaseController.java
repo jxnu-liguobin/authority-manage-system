@@ -1,6 +1,11 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.controller;
 
 import cn.edu.jxnu.base.utils.DateEditor;
+import java.io.IOException;
+import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Date;
-
 /**
  * 主控制类
  *
@@ -27,19 +27,19 @@ import java.util.Date;
 public class BaseController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-//    @Autowired
-//    protected HttpServletRequest request;
-//
-//    @Autowired
-//    protected HttpServletResponse response;
+    //    @Autowired
+    //    protected HttpServletRequest request;
+    //
+    //    @Autowired
+    //    protected HttpServletResponse response;
 
     // 由@InitBinder表示的方法，可以对WebDataBinder对象进行初始化。WebDataBinder是DataBinder的子类，用于完成由表单到JavaBean属性的绑定。
     // @InitBinder方法不能有返回值，它必须名为void。
     // @InitBinder方法的参数通常是WebDataBinder，@InitBinder可以对WebDataBinder进行初始化。
 
     /**
-     * 由InitBinder表示的方法，可以对WebDataBinder对象进行初始化。WebDataBinder是DataBinder的子类，
-     * 用于完成由表单到JavaBean属性的绑定。 InitBinder方法不能有返回值，它必须名为void。
+     * 由InitBinder表示的方法，可以对WebDataBinder对象进行初始化。WebDataBinder是DataBinder的子类， 用于完成由表单到JavaBean属性的绑定。
+     * InitBinder方法不能有返回值，它必须名为void。
      * InitBinder方法的参数通常是WebDataBinder，@InitBinder可以对WebDataBinder进行初始化。
      */
     @InitBinder
@@ -52,16 +52,12 @@ public class BaseController {
         webDataBinder.registerCustomEditor(Date.class, new DateEditor(true));
     }
 
-    /**
-     * 带参重定向
-     */
+    /** 带参重定向 */
     protected String redirect(String path) {
         return "redirect:" + path;
     }
 
-    /**
-     * 不带参重定向
-     */
+    /** 不带参重定向 */
     protected String redirect(HttpServletResponse response, String path) {
         try {
             response.sendRedirect(path);
@@ -71,9 +67,7 @@ public class BaseController {
         return null;
     }
 
-    /**
-     * 获取分页请求 并排序
-     */
+    /** 获取分页请求 并排序 */
     protected PageRequest getPageRequest(HttpServletRequest request) {
         int page = 1;
         int size = 10;
@@ -96,12 +90,10 @@ public class BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return sort==null?  PageRequest.of(page,size):PageRequest.of(page, size, sort);
+        return sort == null ? PageRequest.of(page, size) : PageRequest.of(page, size, sort);
     }
 
-    /**
-     * 获取分页请求 带排序
-     */
+    /** 获取分页请求 带排序 */
     protected PageRequest getPageRequest(HttpServletRequest request, Sort sort) {
         int page = 0;
         int size = 10;
@@ -120,7 +112,6 @@ public class BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return sort==null?  PageRequest.of(page,size):PageRequest.of(page, size, sort);
+        return sort == null ? PageRequest.of(page, size) : PageRequest.of(page, size, sort);
     }
-
 }

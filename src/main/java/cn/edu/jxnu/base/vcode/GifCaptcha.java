@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.vcode;
 
 import java.awt.*;
@@ -6,17 +7,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * <p>
  * Gif验证码类
- * </p>
  *
  * @author wuhongjun
  * @version 1.0
  */
-final public class GifCaptcha extends Captcha {
+public final class GifCaptcha extends Captcha {
 
-    public GifCaptcha() {
-    }
+    public GifCaptcha() {}
 
     private GifCaptcha(int width, int height) {
         this.width = width;
@@ -62,15 +60,14 @@ final public class GifCaptcha extends Captcha {
                 e.printStackTrace();
             }
         }
-
     }
 
     /**
      * 画随机码图
      *
      * @param fontcolor 随机字体颜色
-     * @param strs      字符数组
-     * @param flag      透明度使用
+     * @param strs 字符数组
+     * @param flag 透明度使用
      * @return BufferedImage
      */
     private BufferedImage graphicsImage(Color[] fontcolor, char[] strs, int flag) {
@@ -106,5 +103,4 @@ final public class GifCaptcha extends Captcha {
         float r = (float) 1 / len, s = (len + 1) * r;
         return num > len ? (num * r - s) : num * r;
     }
-
 }

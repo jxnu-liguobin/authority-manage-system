@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.Resource;
@@ -37,5 +38,4 @@ public interface IResourceService extends IBaseService<Resource, Integer> {
      * @author 梦境迷离
      */
     Mono<Resource> find(Integer integer);
-
 }

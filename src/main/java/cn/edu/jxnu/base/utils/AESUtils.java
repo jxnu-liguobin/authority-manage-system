@@ -1,10 +1,11 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 /**
  * AES加密
@@ -14,17 +15,14 @@ import java.util.Arrays;
  */
 public class AESUtils {
 
-    /**
-     * 默认构造
-     */
-    private AESUtils() {
-    }
+    /** 默认构造 */
+    private AESUtils() {}
 
     /**
      * 加密
      *
      * @param secret 密钥
-     * @param value  待加密的字符串
+     * @param value 待加密的字符串
      * @return 加密后的字符串
      */
     public static String encrypt(String secret, String value) {
@@ -44,7 +42,7 @@ public class AESUtils {
      * 解密
      *
      * @param secret 密钥
-     * @param value  待解密字符串
+     * @param value 待解密字符串
      * @return 解密后的字符串
      */
     public static String decrypt(String secret, String value) {
@@ -103,8 +101,7 @@ public class AESUtils {
      * @return byte[]
      */
     private static byte[] parseHexStr2Byte(String hexStr) {
-        if (hexStr.length() < 1)
-            return null;
+        if (hexStr.length() < 1) return null;
         byte[] result = new byte[hexStr.length() / 2];
         for (int i = 0; i < hexStr.length() / 2; i++) {
             int high = Integer.parseInt(hexStr.substring(i * 2, i * 2 + 1), 16);

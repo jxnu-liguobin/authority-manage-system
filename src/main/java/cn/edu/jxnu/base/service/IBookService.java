@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.Book;
@@ -44,12 +45,10 @@ public interface IBookService extends IBaseService<Book, String> {
     Mono<Book> saveOrUpdate(Book book);
 
     /**
-     * 保存或更新图书信息
-     * 携带当前库存
+     * 保存或更新图书信息 携带当前库存
      *
      * @param book
      * @param cInventory
      */
     Mono<Book> saveOrUpdate(Book book, Integer cInventory);
-
 }

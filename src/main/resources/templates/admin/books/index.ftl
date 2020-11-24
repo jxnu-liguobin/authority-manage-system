@@ -54,8 +54,8 @@
                                     <button id = "returnBooks" name="returnBooks" type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#returnBookModal">
                                         <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> 还书
                                     </button>
-                                    <button type="button" id="btnExport" 
-                              class="btn btn-primary">导出</button>  
+                                    <button type="button" id="btnExport"
+                              class="btn btn-primary">导出</button>
 
                                 </div>
                                 <div class="example">
@@ -281,8 +281,8 @@
                      function(data){
                          //保留表格第一项其他项清除
                          $("#ReturnBookTable  tr:not(:first)").html("");
-                         var preData=JSON.parse(data);
-                         var obj=JSON.parse(preData);
+                         console.info(data);
+                         var obj=eval("(" + data + ")");
                          for(var i=0;i<obj.books.length;i++)
                          {
                              //注意月份从0开始
@@ -350,7 +350,9 @@
                  $.ajax({
                      type: "POST",
                      dataType: "json",
-                     url: "${ctx!}/web/books/returnBook/" + mborrowlist,
+                     contentType : 'application/json',
+                     data: mborrowlist,
+                     url: "${ctx!}/web/books/returnBook",
                      success: function(msg){
                          //每还一本书就动态将该行删除
                          var id="#"+bookId;

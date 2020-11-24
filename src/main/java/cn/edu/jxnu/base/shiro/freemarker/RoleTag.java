@@ -1,22 +1,22 @@
-package cn.edu.jxnu.base.config.shiro.freemarker;
-
-import java.io.IOException;
-import java.util.Map;
+/* 梦境迷离 (C)2020 */
+package cn.edu.jxnu.base.shiro.freemarker;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- * <p>Equivalent to {@link org.apache.shiro.web.tags.RoleTag}</p>
- */
+/** Equivalent to {@link org.apache.shiro.web.tags.RoleTag} */
 public abstract class RoleTag extends SecureTag {
     String getName(@SuppressWarnings("rawtypes") Map params) {
         return getParam(params, "name");
     }
 
     @Override
-    public void render(Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body) throws IOException, TemplateException {
+    public void render(
+            Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body)
+            throws IOException, TemplateException {
         boolean show = showTagBody(getName(params));
         if (show) {
             renderBody(env, body);

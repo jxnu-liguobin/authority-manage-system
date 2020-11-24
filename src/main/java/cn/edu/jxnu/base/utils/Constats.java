@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.utils;
 
 /**
@@ -8,16 +9,11 @@ package cn.edu.jxnu.base.utils;
  */
 public interface Constats {
 
-    /**
-     * 当前所有用户
-     */
+    /** 当前所有用户 */
     String CURRENTUSER = "_currentUser";
 
-    /**
-     * 当前用户
-     */
+    /** 当前用户 */
     String CURRENT = "curr";
 
     String BOOK_REDIS_KEY = "book_redis_key";
-
 }

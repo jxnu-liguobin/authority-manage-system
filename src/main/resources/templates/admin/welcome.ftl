@@ -308,7 +308,9 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: "${ctx!}/web/books/borrowlist/"+ mborrowlist ,
+                contentType : 'application/json',
+                url: "${ctx!}/web/books/borrowlist" ,
+                data: mborrowlist,
                 success: function(msg){
                     layer.msg(msg.message, {time: 2000},function(){
                         //要清空booklist中对应在table中的书籍数据

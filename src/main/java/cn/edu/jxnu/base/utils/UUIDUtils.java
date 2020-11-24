@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.utils;
 
 import java.util.UUID;
@@ -18,5 +19,4 @@ public class UUIDUtils {
     public static String makeID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
-
 }

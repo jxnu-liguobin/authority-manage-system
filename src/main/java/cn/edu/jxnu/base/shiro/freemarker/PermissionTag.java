@@ -1,23 +1,22 @@
-package cn.edu.jxnu.base.config.shiro.freemarker;
-
-import java.io.IOException;
-import java.util.Map;
+/* 梦境迷离 (C)2020 */
+package cn.edu.jxnu.base.shiro.freemarker;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- * <p>Equivalent to {@link org.apache.shiro.web.tags.PermissionTag}</p>
- */
+/** Equivalent to {@link org.apache.shiro.web.tags.PermissionTag} */
 public abstract class PermissionTag extends SecureTag {
     String getName(@SuppressWarnings("rawtypes") Map params) {
         return getParam(params, "name");
     }
-    
+
     @Override
-    protected void verifyParameters(@SuppressWarnings("rawtypes") Map params) throws TemplateModelException {
+    protected void verifyParameters(@SuppressWarnings("rawtypes") Map params)
+            throws TemplateModelException {
         String permission = getName(params);
 
         if (permission == null || permission.length() == 0) {
@@ -26,7 +25,9 @@ public abstract class PermissionTag extends SecureTag {
     }
 
     @Override
-    public void render(Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body) throws IOException, TemplateException {
+    public void render(
+            Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body)
+            throws IOException, TemplateException {
         String p = getName(params);
 
         boolean show = showTagBody(p);

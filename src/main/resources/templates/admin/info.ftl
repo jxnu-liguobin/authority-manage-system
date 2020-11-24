@@ -109,7 +109,7 @@
                     minlength: 5,
                     maxlength: 10,
                   /*   remote:{
-                    	 url:"/admin/user/isExist",//该url没有被拦截
+                    	 url:"/admin/user/notExist",//该url没有被拦截
                     	 type: 'GET',//请求方式
                     	 delay :  2000,
                     	 //默认提交当前input value

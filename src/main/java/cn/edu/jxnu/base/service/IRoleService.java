@@ -1,3 +1,4 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.service;
 
 import cn.edu.jxnu.base.entity.Role;
@@ -27,5 +28,4 @@ public interface IRoleService extends IBaseService<Role, Integer> {
      * @return
      */
     Mono<Role> grant(Integer id, String[] resourceIds);
-
 }

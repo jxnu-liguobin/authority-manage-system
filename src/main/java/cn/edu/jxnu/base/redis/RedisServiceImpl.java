@@ -1,16 +1,16 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.redis;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author 梦境迷离
@@ -20,11 +20,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class RedisServiceImpl implements RedisService {
 
-    @Autowired
-    private RedisTemplate<Object, ?> redisTemplate;
+    @Autowired private RedisTemplate<Object, ?> redisTemplate;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    @Autowired private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 添加map
@@ -147,5 +145,4 @@ public class RedisServiceImpl implements RedisService {
         }
         return true;
     }
-
 }

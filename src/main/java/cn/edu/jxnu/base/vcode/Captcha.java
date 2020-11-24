@@ -1,15 +1,13 @@
+/* 梦境迷离 (C)2020 */
 package cn.edu.jxnu.base.vcode;
-
-import lombok.Getter;
-import lombok.Setter;
 
 import java.awt.*;
 import java.io.OutputStream;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>
  * 验证码抽象类,暂时不支持中文
- * </p>
  *
  * @author wuhongjun
  * @version 1.0
@@ -43,10 +41,8 @@ public abstract class Captcha extends Randoms {
      * @return Color 随机颜色
      */
     protected Color color(int fc, int bc) {
-        if (fc > 255)
-            fc = 255;
-        if (bc > 255)
-            bc = 255;
+        if (fc > 255) fc = 255;
+        if (bc > 255) bc = 255;
         int r = fc + num(bc - fc);
         int g = fc + num(bc - fc);
         int b = fc + num(bc - fc);
