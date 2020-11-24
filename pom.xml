@@ -219,10 +219,27 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>2.5.0</version>
                 <configuration>
+                    <formats>
+                        <!-- you can define as many formats as you want, each is independent -->
+                        <format>
+                            <!-- define the files to apply to -->
+                            <includes>
+                                <include>*.java</include>
+                            </includes>
+                            <!-- define the steps to apply to those files -->
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                            <indent>
+                                <spaces>true</spaces>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+                        </format>
+                    </formats>
                     <java>
                         <includes>
                             <include>src/**/java/**/*.java</include>
                         </includes>
+                        <removeUnusedImports /> <!-- self-explanatory -->
                         <googleJavaFormat>
                             <!-- Optional, available versions: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.google.googlejavaformat%22%20AND%20a%3A%22google-java-format%22 -->
                             <version>1.6</version>

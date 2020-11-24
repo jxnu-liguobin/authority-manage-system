@@ -55,7 +55,7 @@ public class MemorandumComponent {
     public final synchronized void saveMemorandum(String usercode, String userName, String type) {
         Memorandum m = new Memorandum(0, new Date(), usercode, userName, type + " | " + usercode);
         log.info("保存操作记录: {}", m.toString());
-        this.instance().save(m);
+        this.instance().save(m).subscribe();
     }
 
     /**
@@ -68,6 +68,6 @@ public class MemorandumComponent {
             String usercode, String userName, String type, String ucode) {
         Memorandum m = new Memorandum(0, new Date(), usercode, userName, type + " | " + ucode);
         log.info("保存操作记录: {}", m.toString());
-        this.instance().save(m);
+        this.instance().save(m).subscribe();
     }
 }

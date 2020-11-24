@@ -7,6 +7,7 @@ import cn.edu.jxnu.base.service.IBaseService;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,7 +28,13 @@ public abstract class BaseServiceImpl<T extends BaseEntity, ID extends Serializa
 
     @Override
     public Mono<T> find(ID id) {
-        return Mono.justOrEmpty(baseDao().getOne(id));
+        // TODO getOne 在找不到时就会抛出异常
+        Optional<T> uOpt = baseDao().findById(id);
+        if (uOpt.isPresent()) {
+            return Mono.just(uOpt.get());
+        } else {
+            return Mono.empty();
+        }
     }
 
     @Override

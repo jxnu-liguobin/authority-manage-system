@@ -11,9 +11,10 @@ import cn.edu.jxnu.base.service.specification.SimpleSpecificationBuilder;
 import cn.edu.jxnu.base.service.specification.SpecificationOperator.Operator;
 import cn.edu.jxnu.base.shiro.RetryLimitHashedCredentialsMatcher;
 import cn.edu.jxnu.base.utils.JsonResult;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.http.HttpServletRequest;
@@ -109,55 +110,53 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable Integer id, @RequestParam("uCode") String uCode) {
-        Mono<Mono<Mono<String>>> monoRes;
-        Mono<User> beUMono = userService.find(id);
-        userService.delete(id).subscribe();
-        Mono<User> userMono = userService.find(id);
-        monoRes =
-                beUMono.map(
-                        beU ->
-                                userMono.map(
-                                        user ->
-                                                userService
-                                                        .findByUserCode(uCode)
-                                                        .map(
-                                                                u -> {
-                                                                    String res = "";
-                                                                    if (user != null
-                                                                            && user
-                                                                                            .getDeleteStatus()
-                                                                                    == 1) {
-                                                                        res = "已注销";
-                                                                        memorandumComponent
-                                                                                .saveMemorandum(
-                                                                                        uCode,
-                                                                                        u
-                                                                                                .getUserName(),
-                                                                                        "注销用户",
-                                                                                        beU
-                                                                                                        .getUserCode()
-                                                                                                + " | "
-                                                                                                + beU
-                                                                                                        .getUserName());
-                                                                    }
-                                                                    if (user == null) {
-                                                                        res = "已删除";
-                                                                        memorandumComponent
-                                                                                .saveMemorandum(
-                                                                                        uCode,
-                                                                                        u
-                                                                                                .getUserName(),
-                                                                                        "删除用户",
-                                                                                        beU
-                                                                                                        .getUserCode()
-                                                                                                + " | "
-                                                                                                + beU
-                                                                                                        .getUserName());
-                                                                    }
-                                                                    return res;
-                                                                })));
+        try {
+            Mono<User> beUMono = userService.find(id);
+            final User beU = beUMono.block(Duration.ofSeconds(3)); // TODO 阻塞
+            if (beU == null) {
+                return Mono.just(JsonResult.failure("用户不存在！"));
+            }
+            if (beU.getUserCode().equals(uCode)) {
+                return Mono.just(JsonResult.failure("不能删除自己！"));
+            }
+            userService.delete(id).subscribe();
+            Mono<User> aUMono = userService.find(id);
+            Mono<User> adminUserMono = userService.findByUserCode(uCode);
+            Mono<String> monoRes =
+                    adminUserMono.map(adminUser -> delStatus(beU, aUMono, adminUser));
+            return monoRes.map(JsonResult::success);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Mono.just(JsonResult.failure(e.getMessage()));
+        }
+    }
 
-        return Objects.requireNonNull(monoRes.map(Mono::block).block()).map(JsonResult::success);
+    /**
+     * @param beUser 删前查询的用户
+     * @param aUMono 删后查询的用户
+     * @param adminUser 操作的管理人
+     * @return
+     */
+    private String delStatus(User beUser, Mono<User> aUMono, User adminUser) {
+        Optional<User> afUser = aUMono.blockOptional();
+        String res = "";
+        if (afUser.isPresent() && afUser.get().getDeleteStatus() == 1) {
+            res = "已注销";
+            memorandumComponent.saveMemorandum(
+                    adminUser.getUserCode(),
+                    adminUser.getUserName(),
+                    "注销用户",
+                    beUser.getUserCode() + " | " + beUser.getUserName());
+        }
+        if (!afUser.isPresent()) {
+            res = "已删除";
+            memorandumComponent.saveMemorandum(
+                    adminUser.getUserCode(),
+                    adminUser.getUserName(),
+                    "删除用户",
+                    beUser.getUserCode() + " | " + beUser.getUserName());
+        }
+        return res;
     }
 
     /** 打开分配角色页面 */

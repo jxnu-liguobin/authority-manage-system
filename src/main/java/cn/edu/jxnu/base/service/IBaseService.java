@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
  */
 public interface IBaseService<T, ID extends Serializable> {
 
+    // 应该使用Optional
     Mono<T> find(ID id);
 
     Flux<T> findAll();

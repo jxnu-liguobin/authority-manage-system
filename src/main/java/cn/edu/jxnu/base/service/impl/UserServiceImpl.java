@@ -90,12 +90,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements I
         }
     }
 
-    /**
-     * 删除分两种：真正删除和转换为设置一个删除标志位，数据仍然保存
-     *
-     * @param id
-     * @return
-     */
+    /** 删除分两种：真正删除和转换为设置一个删除标志位，数据仍然保存 */
     @Override
     public Mono<Boolean> delete(Integer id) {
         log.info("delete: " + id);
@@ -110,11 +105,13 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements I
                                 // 用户借过书，不允许直接删除信息。
                                 Assert.state((u.length == 0), "用户还有借书记录，请还书后操作");
                                 // 已被删除的，此次将真的删除。
-                                delete(user);
+                                user.setUpdateTime(new Date());
+                                delete(user).subscribe();
                             } else {
                                 // 置位1
                                 user.setDeleteStatus(1);
-                                update(user);
+                                user.setUpdateTime(new Date());
+                                update(user).subscribe();
                             }
                             return true;
                         });
