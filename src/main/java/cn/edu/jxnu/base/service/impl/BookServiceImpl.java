@@ -55,7 +55,7 @@ public class BookServiceImpl extends BaseServiceImpl<Book, String> implements IB
     // 库存修改的时候，需要根据库存修改，动态修改可用库存，所以需要保留原有总库存
     @Override
     public Mono<Book> saveOrUpdate(Book book, Integer cInventory) {
-        logger.info("saveOrUpdate:" + book.toString());
+        logger.info("saveOrUpdate: " + book.toString());
         if (book.getBookId() == null || book.getBookId().length() == 0) {
             book.setBookId(UUIDUtils.makeID());
             book.setCurrentInventory(book.getBookInventory());
@@ -86,7 +86,7 @@ public class BookServiceImpl extends BaseServiceImpl<Book, String> implements IB
 
     @Override
     public Mono<Book> saveOrUpdate(Book book) {
-        logger.info("saveOrUpdate:" + book.toString());
+        logger.info("saveOrUpdate: " + book.toString());
         if (book.getBookId() == null || book.getBookId().length() == 0) {
             book.setBookId(UUIDUtils.makeID());
             book.setCurrentInventory(book.getBookInventory());

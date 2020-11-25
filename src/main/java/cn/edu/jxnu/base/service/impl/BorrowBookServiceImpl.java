@@ -32,13 +32,13 @@ public class BorrowBookServiceImpl extends BaseServiceImpl<BorrowBook, String>
 
     @Override
     public BorrowBook[] findByBookId(String bookId) {
-        log.info("findByBookId:" + bookId);
+        log.info("findByBookId: " + bookId);
         return borrowBookDao.findByBookId(bookId);
     }
 
     @Override
     public void saveOrUpdate(BorrowBook borrowBook) {
-        log.info("saveOrUpdate:  " + borrowBook.toString());
+        log.info("saveOrUpdate: " + borrowBook.toString());
         save(borrowBook).subscribe();
     }
 

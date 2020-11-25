@@ -126,7 +126,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements I
      */
     @Override
     public Mono<User> grant(Integer id, String[] roleIds) {
-        log.info("grant" + id);
+        log.info("grant: " + id);
         return find(id).map(
                         user -> {
                             Assert.notNull(user, "用户不存在");
