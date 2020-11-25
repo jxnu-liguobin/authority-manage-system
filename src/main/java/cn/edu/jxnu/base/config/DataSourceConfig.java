@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * 多数据源总的配置
+ * 数据源总的配置
  *
  * @author 梦境迷离
  * @version V2.0 2020年11月20日

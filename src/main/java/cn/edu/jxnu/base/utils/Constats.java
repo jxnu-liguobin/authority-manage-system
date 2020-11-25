@@ -7,13 +7,13 @@ package cn.edu.jxnu.base.utils;
  * @author 梦境迷离
  * @version V2.0 2020年11月20日
  */
-public interface Constats {
+public class Constats {
 
     /** 当前所有用户 */
-    String CURRENTUSER = "_currentUser";
+    public static final String CURRENTUSER = "_currentUser";
 
     /** 当前用户 */
-    String CURRENT = "curr";
+    public static final String CURRENT = "curr";
 
-    String BOOK_REDIS_KEY = "book_redis_key";
+    public static final String BOOK_REDIS_KEY = "book_redis_key";
 }
