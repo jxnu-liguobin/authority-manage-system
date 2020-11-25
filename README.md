@@ -2,12 +2,12 @@
 
 ![](webflux.png)
 
-分支
+# 分支
 
 - master 第一版
 - reactor 第二版
 
-环境
+# 环境
 
 - SpringBoot 2.0.3.RELEASE
 - SpringBoot WebFlux
@@ -18,14 +18,14 @@
 - Redis
 - Freemarker
 
-功能
+# 功能
 
 - Controllers 异步
 - Services 异步
 - Dao 依赖于JDBC和ORM，暂未更改成异步
 - 移除Druid和多数据源
 
-使用 
+# 使用 
 
 1. 启动MySQL
     - 默认账号 root root（或者修改application.properties）
@@ -35,3 +35,13 @@
 4. 查看文档 在浏览器中打开doc目录的index.html（Javadoc）
 
 PS: 第二版并没有修复bug，仅技术改进，代码整理
+
+# 处理流程
+
+- 注解风格
+
+![](webflux1.png)
+
+- 函数式风格
+
+![](webflux-2.png)
