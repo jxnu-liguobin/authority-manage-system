@@ -27,10 +27,10 @@ public class RedisServiceImpl implements RedisService {
     /**
      * 添加map
      *
-     * @param key
-     * @param map
-     * @return
-     * @throws Exception
+     * @param key key
+     * @param map map
+     * @return 是否添加成功
+     * @throws Exception 异常
      */
     public boolean putMap(String key, Map<Integer, List<String>> map) throws Exception {
 
@@ -47,8 +47,8 @@ public class RedisServiceImpl implements RedisService {
     /**
      * 查询哈希表 hKey 中给定域 hashKey 的值.
      *
-     * @param hKey
-     * @param hashKey
+     * @param hKey hKey
+     * @param hashKey hashKey
      * @return 给定K的V
      */
     @Override
@@ -61,9 +61,9 @@ public class RedisServiceImpl implements RedisService {
     /**
      * 获取所有的KV散列值
      *
-     * @param key
+     * @param key key
      * @return map集合
-     * @throws Exception
+     * @throws Exception 异常
      */
     @Override
     public Map<Integer, List<String>> hashGetAll(String key) throws Exception {
@@ -81,9 +81,9 @@ public class RedisServiceImpl implements RedisService {
     /**
      * 添加键值对到哈希表key中
      *
-     * @param key
-     * @param hashKey
-     * @param value
+     * @param key key
+     * @param hashKey hashKey
+     * @param value value
      */
     @Override
     public void hashPushHashMap(String key, Integer hashKey, List<String> value) {
@@ -95,7 +95,7 @@ public class RedisServiceImpl implements RedisService {
     /**
      * 获取哈希表key中的所有域
      *
-     * @param key
+     * @param key key
      * @return map的key set集合
      */
     @Override
@@ -106,8 +106,8 @@ public class RedisServiceImpl implements RedisService {
     /**
      * 删除一个或多个哈希字段
      *
-     * @param key
-     * @param hashKeys
+     * @param key key
+     * @param hashKeys hashKeys
      * @return 成功删除的个数
      */
     @Override

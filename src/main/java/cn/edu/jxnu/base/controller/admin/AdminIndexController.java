@@ -39,20 +39,35 @@ public class AdminIndexController extends BaseController {
 
     @Autowired private IBorrowBookService borrowBookService;
 
-    /** 登陆 */
+    /**
+     * 登陆
+     *
+     * @return String
+     */
     @RequestMapping(value = {"/admin/", "/admin/index"})
     public String index() {
         log.info("登录界面");
         return "admin/index";
     }
 
-    /** 首页查询 */
+    /**
+     * 首页查询
+     *
+     * @return String
+     */
     @RequestMapping(value = {"/admin/welcome"})
     public String welcome() {
         return "admin/welcome";
     }
 
-    /** 用户个人信息页面 */
+    /**
+     * 用户个人信息页面
+     *
+     * @param map map
+     * @param response response
+     * @param id 用户ID
+     * @return String
+     */
     @RequestMapping(value = {"/admin/info"})
     public String info(ModelMap map, HttpServletResponse response, Integer id) {
         log.info("用户id: " + id);
@@ -70,21 +85,35 @@ public class AdminIndexController extends BaseController {
         return "admin/info";
     }
 
-    /** 用户已借阅书籍页面 */
+    /**
+     * 用户已借阅书籍页面
+     *
+     * @return String
+     */
     @RequestMapping(value = {"/admin/borrow"})
     public String borrow() {
         // 给页面传入必须的已借书籍
         return "admin/borrow";
     }
 
-    /** 注册，不能拦截 */
+    /**
+     * 注册，不能拦截
+     *
+     * @param map map
+     * @return String
+     */
     @GetMapping(value = {"/assets/regist"})
     public String regist(ModelMap map) {
         // 携带一个map，用于添加注册表单数据
         return "admin/regist/form";
     }
 
-    /** 登录页面的注册专用 */
+    /**
+     * 登录页面的注册专用
+     *
+     * @param user user
+     * @return Mono JsonResult
+     */
     @RequestMapping(
             value = {"/assets/edit"},
             method = RequestMethod.POST)
@@ -99,7 +128,15 @@ public class AdminIndexController extends BaseController {
         return Mono.just(JsonResult.success("注册成功，3秒后自动回到登录页面"));
     }
 
-    /** 验证用户名【学号】是否已经被注册，委托给用户控制层 */
+    /**
+     * 验证用户名【学号】是否已经被注册，委托给用户控制层
+     *
+     * @param userCode 用户码
+     * @param request request
+     * @param response response
+     * @throws ServletException 异常
+     * @throws IOException 异常
+     */
     @RequestMapping(value = {"/assets/isAvailable"})
     public void isAvailableUse(
             String userCode, HttpServletRequest request, HttpServletResponse response)
@@ -109,7 +146,14 @@ public class AdminIndexController extends BaseController {
                 .forward(request, response);
     }
 
-    /** 所有人均可修改的个人信息 */
+    /**
+     * 所有人均可修改的个人信息
+     *
+     * @param user user
+     * @param map map
+     * @param response response
+     * @return Mono JsonResult
+     */
     @ResponseBody
     @RequestMapping(
             value = {"/assets/update"},
@@ -136,7 +180,15 @@ public class AdminIndexController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 查询用户已借阅的图书 每个人均可操作，不需要授权。超期不可自主归还 */
+    /**
+     * 查询用户已借阅的图书 每个人均可操作，不需要授权。超期不可自主归还
+     *
+     * @param map map
+     * @param uCode 用户码
+     * @param request request
+     * @param response response
+     * @return Mono Page
+     */
     @RequestMapping(value = {"/assets/borrowList"})
     @ResponseBody
     public Mono<Page<BorrowBook>> borrowList(

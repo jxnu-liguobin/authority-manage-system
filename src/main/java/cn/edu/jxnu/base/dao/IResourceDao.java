@@ -22,7 +22,7 @@ public interface IResourceDao extends IBaseDao<Resource, Integer> {
      *
      * <p>删除角色的权限
      *
-     * @param id
+     * @param id 资源ID
      */
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM tb_role_resource WHERE resource_id = :id")
@@ -31,7 +31,7 @@ public interface IResourceDao extends IBaseDao<Resource, Integer> {
     /**
      * 查询一个资源
      *
-     * @param id
+     * @param id 资源ID
      * @return Resource
      */
     Optional<Resource> findById(@Param("id") Integer id);

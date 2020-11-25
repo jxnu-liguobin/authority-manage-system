@@ -34,13 +34,22 @@ public class RoleController extends BaseController {
 
     @Autowired private IUserService userService;
 
-    /** 打开角色管理首页页面 */
+    /**
+     * 打开角色管理首页页面
+     *
+     * @return String
+     */
     @RequestMapping(value = {"/", "/index"})
     public String index() {
         return "admin/role/index";
     }
 
-    /** 角色管理分页 */
+    /**
+     * 角色管理分页
+     *
+     * @param request request
+     * @return Mono Page
+     */
     @RequestMapping(value = {"/list"})
     @ResponseBody
     public Mono<Page<Role>> list(HttpServletRequest request) {
@@ -53,7 +62,12 @@ public class RoleController extends BaseController {
         return roleService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
-    /** 打开添加角色页面 */
+    /**
+     * 打开添加角色页面
+     *
+     * @param map map
+     * @return String
+     */
     @RequestMapping(value = "/add")
     public String add(ModelMap map) {
         Role role = new Role();
@@ -65,7 +79,9 @@ public class RoleController extends BaseController {
     /**
      * 打开角色修改页面
      *
-     * @return
+     * @param id 角色ID
+     * @param map map
+     * @return String
      */
     @RequestMapping(value = "/edit/{id}")
     public String edit(@PathVariable Integer id, ModelMap map) {
@@ -75,7 +91,13 @@ public class RoleController extends BaseController {
         return "admin/role/form";
     }
 
-    /** 添加或修改角色 */
+    /**
+     * 添加或修改角色
+     *
+     * @param role role
+     * @param uCode 用户码
+     * @return Mono JsonResult
+     */
     @RequestMapping(
             value = {"/edit"},
             method = RequestMethod.POST)
@@ -94,7 +116,13 @@ public class RoleController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 删除角色 */
+    /**
+     * 删除角色
+     *
+     * @param id 用户ID
+     * @param uCode 用户码
+     * @return Mono JsonResult
+     */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable Integer id, @RequestParam("uCode") String uCode) {
@@ -116,7 +144,13 @@ public class RoleController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 打开授权页面 */
+    /**
+     * 打开授权页面
+     *
+     * @param id 角色ID
+     * @param map map
+     * @return String
+     */
     @RequestMapping(value = "/grant/{id}")
     public String grant(@PathVariable Integer id, ModelMap map) {
         Mono<Role> role = roleService.find(id);
@@ -124,7 +158,13 @@ public class RoleController extends BaseController {
         return "admin/role/grant";
     }
 
-    /** 授权 */
+    /**
+     * 授权
+     *
+     * @param id 角色ID
+     * @param resourceIds 资源ID
+     * @return Mono JsonResult
+     */
     @RequestMapping(value = "/grant/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> grant(

@@ -32,13 +32,22 @@ public class MemorandumController extends BaseController {
 
     @Autowired private IMemorandumService memorandumService;
 
-    /** 打开备忘录首页 */
+    /**
+     * 打开备忘录首页
+     *
+     * @return String
+     */
     @RequestMapping("/index")
     public String index() {
         return "admin/memorandum/index";
     }
 
-    /** 分页 */
+    /**
+     * 分页
+     *
+     * @param request request
+     * @return Mono Page
+     */
     @RequestMapping(value = "/list")
     @ResponseBody
     public Mono<Page<Memorandum>> list(HttpServletRequest request) {
@@ -56,7 +65,12 @@ public class MemorandumController extends BaseController {
                 });
     }
 
-    /** 删除 */
+    /**
+     * 删除
+     *
+     * @param id id
+     * @return Mono JsonResult
+     */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable Integer id) {

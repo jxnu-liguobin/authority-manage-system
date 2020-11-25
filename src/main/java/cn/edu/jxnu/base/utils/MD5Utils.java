@@ -44,7 +44,11 @@ public class MD5Utils {
         return md5(salt + md5(input));
     }
 
-    /** 修改密码 */
+    /**
+     * 修改密码
+     *
+     * @param args args
+     */
     public static void main(String[] args) {
         String passw = "111111";
         String r = MD5Utils.md5(passw);

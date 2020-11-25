@@ -79,7 +79,8 @@ public class ResourceServiceImpl extends BaseServiceImpl<Resource, Integer>
     /**
      * 超级管理员不能分配资源
      *
-     * @return
+     * @param resource 资源
+     * @return Mono Resource
      */
     @Override
     @CacheEvict(value = "resourceCache") // 清除缓存元素外

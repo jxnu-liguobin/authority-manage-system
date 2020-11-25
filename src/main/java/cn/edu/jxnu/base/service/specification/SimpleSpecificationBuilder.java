@@ -20,9 +20,9 @@ public class SimpleSpecificationBuilder<T> {
     /**
      * 构造函数，初始化的条件是and
      *
-     * @param key
-     * @param oper
-     * @param value
+     * @param key key
+     * @param oper oper
+     * @param value value
      */
     public SimpleSpecificationBuilder(String key, String oper, Object value) {
         SpecificationOperator so = new SpecificationOperator();
@@ -41,10 +41,10 @@ public class SimpleSpecificationBuilder<T> {
     /**
      * 完成条件的添加
      *
-     * @param key
-     * @param oper
-     * @param value
-     * @param join
+     * @param key key
+     * @param oper oper
+     * @param value value
+     * @param join join
      * @return SimpleSpecificationBuilder构建好的查询 this，方便后续的链式调用
      */
     public SimpleSpecificationBuilder<T> add(String key, String oper, Object value, String join) {
@@ -63,9 +63,9 @@ public class SimpleSpecificationBuilder<T> {
     /**
      * 添加or条件的重载
      *
-     * @param key
-     * @param oper
-     * @param value
+     * @param key key
+     * @param oper oper
+     * @param value value
      * @return this，方便后续的链式调用
      */
     public SimpleSpecificationBuilder<T> addOr(String key, String oper, Object value) {
@@ -75,9 +75,9 @@ public class SimpleSpecificationBuilder<T> {
     /**
      * 添加and的条件
      *
-     * @param key
-     * @param oper
-     * @param value
+     * @param key key
+     * @param oper oper
+     * @param value value
      * @return this，方便后续的链式调用
      */
     public SimpleSpecificationBuilder<T> add(String key, String oper, Object value) {

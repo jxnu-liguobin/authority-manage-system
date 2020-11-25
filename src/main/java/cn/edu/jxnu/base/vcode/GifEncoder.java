@@ -80,7 +80,6 @@ public class GifEncoder {
      * indefinitely. Must be invoked before the first image is added.
      *
      * @param iter int number of iterations.
-     * @return
      */
     public void setRepeat(int iter) {
         if (iter >= 0) {
@@ -164,6 +163,8 @@ public class GifEncoder {
     /**
      * Flushes any pending data and closes output file. If writing to an OutputStream, the stream is
      * not closed.
+     *
+     * @return boolean
      */
     public boolean finish() {
         if (!started) return false;
@@ -212,7 +213,6 @@ public class GifEncoder {
      * Values greater than 20 do not yield significant improvements in speed.
      *
      * @param quality int greater than 0.
-     * @return
      */
     public void setQuality(int quality) {
         if (quality < 1) quality = 1;
@@ -303,7 +303,12 @@ public class GifEncoder {
         }
     }
 
-    /** Returns index of palette color closest to c */
+    /**
+     * Returns index of palette color closest to c
+     *
+     * @param c c
+     * @return int
+     */
     protected int findClosest(Color c) {
         if (colorTab == null) return -1;
         int r = c.getRed();
@@ -342,7 +347,11 @@ public class GifEncoder {
         pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
     }
 
-    /** Writes Graphic Control Extension */
+    /**
+     * Writes Graphic Control Extension
+     *
+     * @throws IOException IOException
+     */
     protected void writeGraphicCtrlExt() throws IOException {
         out.write(0x21); // extension introducer
         out.write(0xf9); // GCE label
@@ -372,7 +381,11 @@ public class GifEncoder {
         out.write(0); // block terminator
     }
 
-    /** Writes Image Descriptor */
+    /**
+     * Writes Image Descriptor
+     *
+     * @throws IOException IOException
+     */
     protected void writeImageDesc() throws IOException {
         out.write(0x2c); // image separator
         writeShort(0); // image position x,y = 0,0
@@ -394,7 +407,11 @@ public class GifEncoder {
         }
     }
 
-    /** Writes Logical Screen Descriptor */
+    /**
+     * Writes Logical Screen Descriptor
+     *
+     * @throws IOException IOException
+     */
     protected void writeLSD() throws IOException {
         // logical screen size
         writeShort(width);
@@ -410,7 +427,11 @@ public class GifEncoder {
         out.write(0); // pixel aspect ratio - assume 1:1
     }
 
-    /** Writes Netscape application extension to define repeat count. */
+    /**
+     * Writes Netscape application extension to define repeat count.
+     *
+     * @throws IOException IOException
+     */
     protected void writeNetscapeExt() throws IOException {
         out.write(0x21); // extension introducer
         out.write(0xff); // app extension label
@@ -422,7 +443,11 @@ public class GifEncoder {
         out.write(0); // block terminator
     }
 
-    /** Writes color table */
+    /**
+     * Writes color table
+     *
+     * @throws IOException IOException
+     */
     protected void writePalette() throws IOException {
         out.write(colorTab, 0, colorTab.length);
         int n = (3 * 256) - colorTab.length;
@@ -431,19 +456,33 @@ public class GifEncoder {
         }
     }
 
-    /** Encodes and writes pixel data */
+    /**
+     * Encodes and writes pixel data
+     *
+     * @throws IOException IOException
+     */
     protected void writePixels() throws IOException {
         Encoder encoder = new Encoder(width, height, indexedPixels, colorDepth);
         encoder.encode(out);
     }
 
-    /** Write 16-bit value to output stream, LSB first */
+    /**
+     * Write 16-bit value to output stream, LSB first
+     *
+     * @param value value
+     * @throws IOException IOException
+     */
     protected void writeShort(int value) throws IOException {
         out.write(value & 0xff);
         out.write((value >> 8) & 0xff);
     }
 
-    /** Writes string to output stream */
+    /**
+     * Writes string to output stream
+     *
+     * @param s str
+     * @throws IOException IOException
+     */
     protected void writeString(String s) throws IOException {
         for (int i = 0; i < s.length(); i++) {
             out.write((byte) s.charAt(i));

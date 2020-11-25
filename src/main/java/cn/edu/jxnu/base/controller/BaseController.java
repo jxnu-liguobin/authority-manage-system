@@ -41,6 +41,8 @@ public class BaseController {
      * 由InitBinder表示的方法，可以对WebDataBinder对象进行初始化。WebDataBinder是DataBinder的子类， 用于完成由表单到JavaBean属性的绑定。
      * InitBinder方法不能有返回值，它必须名为void。
      * InitBinder方法的参数通常是WebDataBinder，@InitBinder可以对WebDataBinder进行初始化。
+     *
+     * @param webDataBinder webDataBinder
      */
     @InitBinder
     protected void initBinder(WebDataBinder webDataBinder) {
@@ -52,12 +54,23 @@ public class BaseController {
         webDataBinder.registerCustomEditor(Date.class, new DateEditor(true));
     }
 
-    /** 带参重定向 */
+    /**
+     * 带参重定向
+     *
+     * @param path path
+     * @return String
+     */
     protected String redirect(String path) {
         return "redirect:" + path;
     }
 
-    /** 不带参重定向 */
+    /**
+     * 不带参重定向
+     *
+     * @param response response
+     * @param path path
+     * @return String
+     */
     protected String redirect(HttpServletResponse response, String path) {
         try {
             response.sendRedirect(path);
@@ -67,7 +80,12 @@ public class BaseController {
         return null;
     }
 
-    /** 获取分页请求 并排序 */
+    /**
+     * 获取分页请求 并排序
+     *
+     * @param request request
+     * @return PageRequest
+     */
     protected PageRequest getPageRequest(HttpServletRequest request) {
         int page = 1;
         int size = 10;
@@ -93,7 +111,13 @@ public class BaseController {
         return sort == null ? PageRequest.of(page, size) : PageRequest.of(page, size, sort);
     }
 
-    /** 获取分页请求 带排序 */
+    /**
+     * 获取分页请求 带排序
+     *
+     * @param request request
+     * @param sort sort
+     * @return PageRequest
+     */
     protected PageRequest getPageRequest(HttpServletRequest request, Sort sort) {
         int page = 0;
         int size = 10;

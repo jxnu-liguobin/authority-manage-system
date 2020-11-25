@@ -32,5 +32,6 @@
     - 创建数据库 managesystemdb
 2. 启动Redis 默认配置    
 3. 系统登录 admin 111111（默认每次启动都会重新创建表并覆盖写入初始化的数据）
+4. 查看文档 在浏览器中打开doc目录的index.html（Javadoc）
 
 PS: 第二版并没有修复bug，仅技术改进，代码整理

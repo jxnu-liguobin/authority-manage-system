@@ -34,7 +34,7 @@ public class SpecCaptcha extends Captcha {
     /**
      * 生成验证码
      *
-     * @throws java.io.IOException IO异常
+     * @param out out
      */
     @Override
     public void out(OutputStream out) {

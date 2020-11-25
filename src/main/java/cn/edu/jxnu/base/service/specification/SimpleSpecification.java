@@ -27,9 +27,9 @@ public class SimpleSpecification<T> implements Specification<T> {
     /**
      * 重写toPredicate，构造查询条件
      *
-     * @param root
-     * @param criteriaQuery
-     * @param criteriaBuilder
+     * @param root root
+     * @param criteriaQuery criteriaQuery
+     * @param criteriaBuilder criteriaBuilder
      * @return Predicate
      */
     @Override

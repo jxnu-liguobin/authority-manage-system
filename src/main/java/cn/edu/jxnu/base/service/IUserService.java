@@ -15,7 +15,7 @@ public interface IUserService extends IBaseService<User, Integer> {
     /**
      * 根据姓名查询用户
      *
-     * @param username
+     * @param username 用户名
      * @return 用户
      */
     Mono<User> findByUserName(String username);
@@ -23,7 +23,7 @@ public interface IUserService extends IBaseService<User, Integer> {
     /**
      * 根据账号查询用户
      *
-     * @param userCode
+     * @param userCode 用户码
      * @return 用户
      */
     Mono<User> findByUserCode(String userCode);
@@ -31,15 +31,17 @@ public interface IUserService extends IBaseService<User, Integer> {
     /**
      * 增加或者修改用户
      *
-     * @param user
+     * @param user 用户
+     * @return Mono User
      */
     Mono<User> saveOrUpdate(User user);
 
     /**
      * 给用户分配角色
      *
-     * @param id
-     * @param roleIds
+     * @param id 用户ID
+     * @param roleIds 角色ID
+     * @return Mono User
      */
     Mono<User> grant(Integer id, String[] roleIds);
 }

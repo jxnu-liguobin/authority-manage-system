@@ -25,7 +25,7 @@ public class NotFoundExceptionImpl implements ErrorController {
     /**
      * 404 500 处理
      *
-     * @param response
+     * @param response response
      * @return ModelAndView
      */
     @RequestMapping(value = ERROR_PATH)

@@ -40,7 +40,7 @@ public class MyRealm extends AuthorizingRealm {
     /**
      * 根据用户名来添加相应的权限和角色
      *
-     * @param principals
+     * @param principals principals
      * @return 授权用户信息 AuthorizationInfo
      */
     @Override
@@ -72,7 +72,7 @@ public class MyRealm extends AuthorizingRealm {
     /**
      * 密码验证,验证账号不存在或已被注销
      *
-     * @param token
+     * @param token token
      * @return 验证用户信息 AuthenticationInfo
      */
     @Override
@@ -103,7 +103,11 @@ public class MyRealm extends AuthorizingRealm {
                 .block();
     }
 
-    /** 添加自动刷新授权缓存 */
+    /**
+     * 添加自动刷新授权缓存
+     *
+     * @param id 用户ID
+     */
     public void clearCachedAuthorization(Integer id) {
         Mono<User> userMono = userService.find(id);
         clearCachedAuthorizationInfo(

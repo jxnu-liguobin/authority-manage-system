@@ -120,8 +120,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements I
     /**
      * 授权管理
      *
-     * @param id
-     * @param roleIds
+     * @param id 用户ID
+     * @param roleIds 角色ID
+     * @return Mono User
      */
     @Override
     public Mono<User> grant(Integer id, String[] roleIds) {

@@ -16,7 +16,7 @@ public interface IUserDao extends IBaseDao<User, Integer> {
     /**
      * 根据姓名查询用户
      *
-     * @param username
+     * @param username 用户名
      * @return 用户
      */
     User findByUserName(String username);
@@ -24,7 +24,7 @@ public interface IUserDao extends IBaseDao<User, Integer> {
     /**
      * 根据账号查询用户
      *
-     * @param usercode
+     * @param usercode 用户码
      * @return 用户
      */
     User findByUserCode(String usercode);

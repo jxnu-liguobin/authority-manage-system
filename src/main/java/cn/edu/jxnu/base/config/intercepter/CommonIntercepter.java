@@ -19,9 +19,9 @@ public class CommonIntercepter implements HandlerInterceptor {
     /**
      * 返回true
      *
-     * @param request
-     * @param response
-     * @param handler
+     * @param request request
+     * @param response response
+     * @param handler handler
      * @return true
      */
     @Override
@@ -33,10 +33,10 @@ public class CommonIntercepter implements HandlerInterceptor {
     /**
      * 注册全局变量作为前台应用路径
      *
-     * @param request
-     * @param response
-     * @param handler
-     * @param modelAndView
+     * @param request request
+     * @param response response
+     * @param handler handler
+     * @param modelAndView modelAndView
      */
     @Override
     public void postHandle(
@@ -50,10 +50,10 @@ public class CommonIntercepter implements HandlerInterceptor {
     /**
      * 请求之后需要处理的
      *
-     * @param request
-     * @param response
-     * @param handler
-     * @param ex
+     * @param request request
+     * @param response response
+     * @param handler handler
+     * @param ex 异常
      */
     @Override
     public void afterCompletion(

@@ -23,7 +23,7 @@ public class GifCodeController {
     /**
      * 获取验证码（Gif版本）
      *
-     * @param response
+     * @param response response
      */
     @RequestMapping("getGifCode")
     public void getGifCode(HttpServletResponse response) {

@@ -63,7 +63,7 @@ public class User extends BaseEntity {
     /** 更新时间 */
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
-    /** 用户<->角色 多对多关系，设置级联删除，懒加载，中间表tb_user_role，[user_id<->role_id] */
+    /** 用户-角色 多对多关系，设置级联删除，懒加载，中间表tb_user_role，[user_id-role_id] */
     @ManyToMany(
             cascade = {CascadeType.REFRESH},
             fetch = FetchType.LAZY)

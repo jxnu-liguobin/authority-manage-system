@@ -24,7 +24,7 @@ public class ApplicationEventListener implements ApplicationListener<Application
     /**
      * 应用程序启动过程监听
      *
-     * @param event
+     * @param event 应用程序的事件
      */
     @Override
     public void onApplicationEvent(ApplicationEvent event) {

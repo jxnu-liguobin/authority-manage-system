@@ -49,12 +49,18 @@ public class UserController extends BaseController {
 
     @Autowired private MemorandumComponent memorandumComponent;
 
+    /** @return String */
     @RequestMapping(value = {"/", "/index"})
     public String index() {
         return "admin/user/index";
     }
 
-    /** 用户管理页面分页 */
+    /**
+     * 用户管理页面分页
+     *
+     * @param request request
+     * @return Mono Page
+     */
     @RequestMapping(value = {"/list"})
     @ResponseBody
     public Mono<Page<User>> list(HttpServletRequest request) {
@@ -68,13 +74,23 @@ public class UserController extends BaseController {
         return userService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
-    /** 打开用户添加页面 */
+    /**
+     * 打开用户添加页面
+     *
+     * @return String
+     */
     @RequestMapping(value = "/add")
     public String add() {
         return "admin/user/form";
     }
 
-    /** 打开用户修改页面 */
+    /**
+     * 打开用户修改页面
+     *
+     * @param id 用户ID
+     * @param map map
+     * @return String
+     */
     @GetMapping(value = "/edit/{id}")
     public String edit(@PathVariable Integer id, ModelMap map) {
         Mono<User> user = userService.find(id);
@@ -86,7 +102,13 @@ public class UserController extends BaseController {
         return "admin/user/form";
     }
 
-    /** 修改用户 */
+    /**
+     * 修改用户
+     *
+     * @param user 用户
+     * @param uCode 操作者的用户码
+     * @return Mono JsonResult
+     */
     @RequestMapping(
             value = {"/edit"},
             method = RequestMethod.POST)
@@ -106,7 +128,13 @@ public class UserController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 删除用户 */
+    /**
+     * 删除用户
+     *
+     * @param id 用户ID
+     * @param uCode 操作者的用户码
+     * @return Mono JsonResult
+     */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable Integer id, @RequestParam("uCode") String uCode) {
@@ -135,7 +163,7 @@ public class UserController extends BaseController {
      * @param beUser 删前查询的用户
      * @param aUMono 删后查询的用户
      * @param adminUser 操作的管理人
-     * @return
+     * @return String
      */
     private String delStatus(User beUser, Mono<User> aUMono, User adminUser) {
         Optional<User> afUser = aUMono.blockOptional();
@@ -159,7 +187,13 @@ public class UserController extends BaseController {
         return res;
     }
 
-    /** 打开分配角色页面 */
+    /**
+     * 打开分配角色页面
+     *
+     * @param id 用户ID
+     * @param map map
+     * @return String
+     */
     @RequestMapping(value = "/grant/{id}")
     public String grant(@PathVariable Integer id, ModelMap map) {
         Mono<User> userMono = userService.find(id);
@@ -178,7 +212,13 @@ public class UserController extends BaseController {
         return "admin/user/grant";
     }
 
-    /** 分配角色 */
+    /**
+     * 分配角色
+     *
+     * @param id 用户ID
+     * @param roleIds 角色ID
+     * @return Mono JsonResult
+     */
     @ResponseBody
     @RequestMapping(value = "/grant/{id}", method = RequestMethod.POST)
     public Mono<JsonResult> grantRole(@PathVariable Integer id, String[] roleIds) {
@@ -186,7 +226,12 @@ public class UserController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 恢复账号 */
+    /**
+     * 恢复账号
+     *
+     * @param id 用户ID
+     * @return Mono JsonResult
+     */
     @ResponseBody
     @RequestMapping(value = "/resume/{id}", method = RequestMethod.POST)
     public Mono<JsonResult> resume(@PathVariable Integer id) {
@@ -215,7 +260,12 @@ public class UserController extends BaseController {
                         });
     }
 
-    /** 验证用户名【学号】是否已经被注册 */
+    /**
+     * 验证用户名【学号】是否已经被注册
+     *
+     * @param userCode 用户码
+     * @return Mono Boolean
+     */
     @ResponseBody
     @RequestMapping(value = "/notExist")
     public Mono<Boolean> notExist(String userCode) {
@@ -233,14 +283,24 @@ public class UserController extends BaseController {
         }
     }
 
-    /** 修改时，验证永真 */
+    /**
+     * 修改时，验证永真
+     *
+     * @param userCode 用户码
+     * @return Mono Boolean
+     */
     @ResponseBody
     @RequestMapping(value = "/isAllTrue")
     public Mono<Boolean> isAllTrue(String userCode) {
         return Mono.just(true);
     }
 
-    /** 验证用户名【学号】是否已经被注册，代理前端的账户验证 */
+    /**
+     * 验证用户名【学号】是否已经被注册，代理前端的账户验证
+     *
+     * @param userCode 用户码
+     * @return Mono Boolean
+     */
     @ResponseBody
     @RequestMapping(value = "/isAvailable/{userCode}")
     public Mono<Boolean> isAvailable(@PathVariable("userCode") String userCode) {

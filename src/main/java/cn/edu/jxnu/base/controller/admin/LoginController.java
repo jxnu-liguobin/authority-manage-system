@@ -36,13 +36,25 @@ public class LoginController extends BaseController {
 
     @Autowired private RetryLimitHashedCredentialsMatcher credentialsMatcher;
 
-    /** 打开登陆表单 */
+    /**
+     * 打开登陆表单
+     *
+     * @return String
+     */
     @RequestMapping(value = {"/admin/login"})
     public String login() {
         return "admin/login";
     }
 
-    /** 登陆验证 垃圾代码，请勿模仿 */
+    /**
+     * 登陆验证 垃圾代码，请勿模仿
+     *
+     * @param usercode usercode
+     * @param password password
+     * @param model model
+     * @param rememberMe rememberMe
+     * @return String
+     */
     @RequestMapping(
             value = {"/admin/login"},
             method = RequestMethod.POST)
@@ -114,7 +126,12 @@ public class LoginController extends BaseController {
         return "admin/login";
     }
 
-    /** 安全退出 */
+    /**
+     * 安全退出
+     *
+     * @param uCode 用户码
+     * @return String
+     */
     @RequestMapping(value = {"/admin/logout/{uCode}"})
     public String logout(@PathVariable("uCode") String uCode) {
         Subject subject = SecurityUtils.getSubject();

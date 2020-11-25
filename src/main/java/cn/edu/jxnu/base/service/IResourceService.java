@@ -17,25 +17,24 @@ public interface IResourceService extends IBaseService<Resource, Integer> {
     /**
      * 获取角色的权限树
      *
-     * @param roleId
-     * @return List<ZtreeView>
+     * @param roleId 角色ID
+     * @return List ZtreeView
      */
     Flux<ZtreeView> tree(int roleId);
 
     /**
      * 修改或者新增资源
      *
-     * @param resource
-     * @return
+     * @param resource 资源
+     * @return Mono Resource
      */
     Mono<Resource> saveOrUpdate(Resource resource);
 
     /**
      * 根据id查询资源
      *
-     * @param integer
-     * @return Resource
-     * @author 梦境迷离
+     * @param integer 资源ID
+     * @return Resource Resource
      */
     Mono<Resource> find(Integer integer);
 }

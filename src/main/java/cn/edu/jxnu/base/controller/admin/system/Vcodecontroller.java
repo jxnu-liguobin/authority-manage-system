@@ -20,7 +20,12 @@ public class Vcodecontroller {
 
     @Autowired private RedisService redisService;
 
-    /** 这里有个BUG，第一次请求的时候验证码2秒发送一个请求是正常的，但是验证码错误，进行第二次输入时，每次输入单个字母就发送请求。未知原因 */
+    /**
+     * 这里有个BUG，第一次请求的时候验证码2秒发送一个请求是正常的，但是验证码错误，进行第二次输入时，每次输入单个字母就发送请求。未知原因
+     *
+     * @param vcode 验证码
+     * @return Mono Boolean
+     */
     @ResponseBody
     @RequestMapping(value = "/isTrue")
     public Mono<Boolean> isTrue(@RequestParam("vcode") String vcode) {

@@ -55,7 +55,11 @@ public class WebLogAspect {
      * }
      */
 
-    /** 授权修改之后调用 */
+    /**
+     * 授权修改之后调用
+     *
+     * @param point 切点
+     */
     @After(value = "shiroAop()")
     public void afterGrant(JoinPoint point) {
         int id = (int) point.getArgs()[0];
@@ -65,7 +69,11 @@ public class WebLogAspect {
         realm.clearCachedAuthorization(id);
     }
 
-    /** 使用@Before在切入点开始处切入内容 i的值越小，优先级越高。在切入点前的操作，按order的值由小到大执行,在切入点后的操作，按order的值由大到小执行 */
+    /**
+     * 使用@Before在切入点开始处切入内容 i的值越小，优先级越高。在切入点前的操作，按order的值由小到大执行,在切入点后的操作，按order的值由大到小执行
+     *
+     * @param joinPoint 切点
+     */
     @Order(5)
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) {
@@ -87,7 +95,11 @@ public class WebLogAspect {
         log.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));
     }
 
-    /** 使用@AfterReturning在切入点return内容之后切入内容（可以用来对处理返回值做一些加工处理） */
+    /**
+     * 使用@AfterReturning在切入点return内容之后切入内容（可以用来对处理返回值做一些加工处理）
+     *
+     * @param ret 方法返回
+     */
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) {
         // 处理完请求，返回内容
@@ -95,7 +107,11 @@ public class WebLogAspect {
         log.info("SPEND TIME : " + (System.currentTimeMillis() - startTime.get()));
     }
 
-    /** 使用@After在切入点结尾处切入内容 */
+    /**
+     * 使用@After在切入点结尾处切入内容
+     *
+     * @param joinPoint 切点
+     */
     @After(value = "webLog()")
     public void doAfter(JoinPoint joinPoint) {
         // 处理完请求，返回内容

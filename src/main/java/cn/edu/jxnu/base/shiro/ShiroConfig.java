@@ -34,7 +34,8 @@ public class ShiroConfig {
     /**
      * 注入MyRealm
      *
-     * @return Realm
+     * @param ehCacheManager
+     * @return Realm Realm
      */
     @Bean(name = "realm")
     @DependsOn("lifecycleBeanPostProcessor")
@@ -48,13 +49,12 @@ public class ShiroConfig {
     /**
      * 密码验证
      *
-     * @return 自定义密码验证
+     * @param cacheManager cacheManager
+     * @return RetryLimitHashedCredentialsMatcher 自定义密码验证
      */
     @Bean("credentialsMatcher")
-    public RetryLimitHashedCredentialsMatcher hashedCredentialsMatcher(CacheManager CacheManager) {
-        RetryLimitHashedCredentialsMatcher credentialsMatcher =
-                new RetryLimitHashedCredentialsMatcher(CacheManager);
-        return credentialsMatcher;
+    public RetryLimitHashedCredentialsMatcher hashedCredentialsMatcher(CacheManager cacheManager) {
+        return new RetryLimitHashedCredentialsMatcher(cacheManager);
     }
 
     /**
@@ -98,8 +98,8 @@ public class ShiroConfig {
     /**
      * shiro拦截器
      *
-     * @param securityManager
-     * @param realm
+     * @param securityManager securityManager
+     * @param realm realm
      * @return ShiroFilterFactoryBean
      */
     @Bean(name = "shiroFilter")
@@ -160,7 +160,11 @@ public class ShiroConfig {
         return shiroFilter;
     }
 
-    /** 产生cookie */
+    /**
+     * 产生cookie
+     *
+     * @return SimpleCookie
+     */
     @Bean
     @ConditionalOnMissingBean
     public SimpleCookie rememberMeCookie() {
@@ -173,7 +177,11 @@ public class ShiroConfig {
         return simpleCookie;
     }
 
-    /** cookie管理对象 */
+    /**
+     * cookie管理对象
+     *
+     * @return CookieRememberMeManager
+     */
     @Bean
     @ConditionalOnMissingBean
     public CookieRememberMeManager rememberMeManager() {

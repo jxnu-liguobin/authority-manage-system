@@ -48,9 +48,9 @@ public class MemorandumComponent {
     /**
      * 自主登陆或者注册使用，即本身就是操作人
      *
-     * @param usercode
-     * @param userName
-     * @param type
+     * @param usercode 用户码
+     * @param userName 用户名
+     * @param type 操作类型
      */
     public final synchronized void saveMemorandum(String usercode, String userName, String type) {
         Memorandum m = new Memorandum(0, new Date(), usercode, userName, type + " | " + usercode);

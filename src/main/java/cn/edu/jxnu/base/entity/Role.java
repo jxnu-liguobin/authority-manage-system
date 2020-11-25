@@ -47,7 +47,7 @@ public class Role extends BaseEntity {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
-    /** 角色<->资源 多对多关系，设置级联删除，懒加载，中间表tb_role_resource，[role_id<->resource_id] */
+    /** 角色-资源 多对多关系，设置级联删除，懒加载，中间表tb_role_resource，[role_id-resource_id] */
     @ManyToMany(
             cascade = {CascadeType.REFRESH},
             fetch = FetchType.LAZY)

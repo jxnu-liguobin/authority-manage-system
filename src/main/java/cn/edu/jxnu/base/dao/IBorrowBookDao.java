@@ -17,7 +17,7 @@ public interface IBorrowBookDao extends IBaseDao<BorrowBook, String> {
     /**
      * 根据用户查询借阅列表
      *
-     * @param userId
+     * @param userId 用户ID
      * @return 借书列表
      */
     BorrowBook[] findByUserId(int userId);
@@ -25,7 +25,7 @@ public interface IBorrowBookDao extends IBaseDao<BorrowBook, String> {
     /**
      * 根据图书查询借阅列表
      *
-     * @param bookId
+     * @param bookId 图书ID
      * @return 借书列表
      */
     BorrowBook[] findByBookId(String bookId);
@@ -33,13 +33,18 @@ public interface IBorrowBookDao extends IBaseDao<BorrowBook, String> {
     /**
      * 根据用户ID和图书ID查询唯一一条借书记录
      *
-     * @param userId
-     * @param bookId
+     * @param userId 用户ID
+     * @param bookId 图书ID
      * @return 一条借书记录
      */
     BorrowBook findByUserIdAndBookId(int userId, String bookId);
 
-    /** 事务删除或修改操作，不支持新增/插入 */
+    /**
+     * 事务删除或修改操作，不支持新增/插入
+     *
+     * @param userId 用户ID
+     * @param bookId 书ID
+     */
     @Modifying
     @Query("DELETE FROM BorrowBook b WHERE b.userId = ?1 and b.bookId= ?2")
     void mDelet(int userId, String bookId);

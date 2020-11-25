@@ -50,7 +50,13 @@ public interface IBaseService<T, ID extends Serializable> {
 
     Mono<Void> delete(T entity);
 
-    /** 返回list的全部分页查询 */
+    /**
+     * 返回list的全部分页查询
+     *
+     * @param spec spec
+     * @param sort sort
+     * @return Flux
+     */
     Flux<T> findList(
             Specification<T> spec,
             Sort sort); // List<T>是ArrayList类的泛型等效类，该类使用大小可按需动态增加的数组实现IList<T>泛型接口

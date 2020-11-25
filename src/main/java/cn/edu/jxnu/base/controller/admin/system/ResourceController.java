@@ -33,20 +33,34 @@ public class ResourceController extends BaseController {
 
     @Autowired private IResourceService resourceService;
 
-    /** 资源树 */
+    /**
+     * 资源树
+     *
+     * @param resourceId 资源ID
+     * @return Flux ZtreeView
+     */
     @RequestMapping("/tree/{resourceId}")
     @ResponseBody
     public Flux<ZtreeView> tree(@PathVariable Integer resourceId) {
         return resourceService.tree(resourceId);
     }
 
-    /** 打开资源管理首页 */
+    /**
+     * 打开资源管理首页
+     *
+     * @return String
+     */
     @RequestMapping("/index")
     public String index() {
         return "admin/resource/index";
     }
 
-    /** 资源管理分页 */
+    /**
+     * 资源管理分页
+     *
+     * @param request request
+     * @return Mono Page
+     */
     @RequestMapping(
             value = "/list",
             method = {RequestMethod.POST})
@@ -60,7 +74,12 @@ public class ResourceController extends BaseController {
         return resourceService.findAll(builder.generateSpecification(), getPageRequest(request));
     }
 
-    /** 打开资源添加页面 */
+    /**
+     * 打开资源添加页面
+     *
+     * @param map map
+     * @return String
+     */
     @RequestMapping(value = "/add")
     public String add(ModelMap map) {
         Flux<Resource> list = resourceService.findAll();
@@ -68,7 +87,13 @@ public class ResourceController extends BaseController {
         return "admin/resource/form";
     }
 
-    /** 打开资源修改页面 */
+    /**
+     * 打开资源修改页面
+     *
+     * @param id 资源ID
+     * @param map map
+     * @return String
+     */
     @RequestMapping(value = "/edit/{id}")
     public String edit(@PathVariable Integer id, ModelMap map) {
         Mono<Resource> resource = resourceService.find(id);
@@ -78,7 +103,12 @@ public class ResourceController extends BaseController {
         return "admin/resource/form";
     }
 
-    /** 资源添加或修改 */
+    /**
+     * 资源添加或修改
+     *
+     * @param resource 资源
+     * @return Mono JsonResult
+     */
     @RequestMapping(
             value = {"/edit"},
             method = {RequestMethod.POST})
@@ -89,7 +119,12 @@ public class ResourceController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 资源删除 */
+    /**
+     * 资源删除
+     *
+     * @param id 资源ID
+     * @return Mono JsonResult
+     */
     @RequestMapping(
             value = "/delete/{id}",
             method = {RequestMethod.POST})

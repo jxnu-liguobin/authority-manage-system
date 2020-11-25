@@ -33,7 +33,7 @@ public class RedisGetDataListener implements ServletContextListener {
     /**
      * 容器初始化
      *
-     * @param sce
+     * @param sce servlet 上下文
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -64,7 +64,7 @@ public class RedisGetDataListener implements ServletContextListener {
         log.info("初始化redis数据完毕");
     }
 
-    /** @param sce */
+    /** @param sce servlet上下文 */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {}
 }

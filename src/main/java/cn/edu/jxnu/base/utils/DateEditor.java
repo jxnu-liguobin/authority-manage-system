@@ -33,7 +33,11 @@ public class DateEditor extends PropertyEditorSupport {
         "yyyy/MM/dd HH:mm:ss"
     };
 
-    /** 构造方法 */
+    /**
+     * 构造方法
+     *
+     * @param emptyAsNull emptyAsNull
+     */
     public DateEditor(boolean emptyAsNull) {
         this.emptyAsNull = emptyAsNull;
     }

@@ -54,7 +54,7 @@ public class BookController extends BaseController {
     /**
      * 默认索引页
      *
-     * @return
+     * @return String
      */
     @RequestMapping("/index")
     public String index() {
@@ -64,7 +64,7 @@ public class BookController extends BaseController {
     /**
      * 添加图书
      *
-     * @return
+     * @return String
      */
     @RequestMapping(value = {"/addBook"})
     public String addBook() {
@@ -72,9 +72,11 @@ public class BookController extends BaseController {
     }
 
     /**
-     * 删除图书
+     * 考虑书已经被借出去了，不能再删除
      *
-     * <p>考虑书已经被借出去了，不能再删除
+     * @param id 书ID
+     * @param uCode 操作者的用户码
+     * @return Mono JsonResult
      */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
@@ -120,7 +122,12 @@ public class BookController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 借书 */
+    /**
+     * 借书
+     *
+     * @param mBorrowList 借阅书籍
+     * @return Mono JsonResult
+     */
     @PostMapping(value = {"/borrowlist"})
     @ResponseBody
     public Mono<JsonResult> borrowList(@RequestBody BorrowList mBorrowList) {
@@ -193,7 +200,12 @@ public class BookController extends BaseController {
         }
     }
 
-    /** 还书表 */
+    /**
+     * 还书表
+     *
+     * @param id 待还书ID
+     * @return Mono String
+     */
     @RequestMapping(
             value = {"/returnBookList/{id}"},
             method = RequestMethod.POST)
@@ -217,7 +229,13 @@ public class BookController extends BaseController {
         return Mono.just(jsonStr);
     }
 
-    /** 管理员归还图书 */
+    /**
+     * 管理员归还图书
+     *
+     * @param mBorrowList 借阅书籍
+     * @return Mono JsonResult
+     * @throws Exception 异常
+     */
     @PostMapping(value = {"/returnBook"})
     @ResponseBody
     public Mono<JsonResult> returnBook(@RequestBody BorrowList mBorrowList) throws Exception {
@@ -254,7 +272,12 @@ public class BookController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 无授权的归还一本图书 */
+    /**
+     * 无授权的归还一本图书
+     *
+     * @param jsonData 借阅的书籍
+     * @return Mono JsonResult
+     */
     @SneakyThrows
     @PostMapping(value = {"/returnOneBook"})
     @ResponseBody
@@ -275,6 +298,7 @@ public class BookController extends BaseController {
         } catch (Exception e) {
             return Mono.just(JsonResult.failure(e.getMessage()));
         }
+        // 并发库存问题
         bookService
                 .findByBookId(bookId)
                 .subscribe(
@@ -286,14 +310,27 @@ public class BookController extends BaseController {
         return Mono.just(JsonResult.success());
     }
 
-    /** 修改图书响应请求 */
+    /**
+     * 修改图书响应请求
+     *
+     * @param id 书ID
+     * @param map map
+     * @return String
+     */
     @RequestMapping(value = "/edit/{id}")
     public String edit(@PathVariable String id, ModelMap map) {
         bookService.findByBookId(id).subscribe(b -> map.put("book", b));
         return "admin/books/addform";
     }
 
-    /** 修改图书 */
+    /**
+     * 修改图书
+     *
+     * @param book 书
+     * @param uCode 操作者用户码
+     * @param cInventory 库存
+     * @return Mono JsonResult
+     */
     @RequestMapping(
             value = {"/edit"},
             method = RequestMethod.POST)
@@ -324,7 +361,7 @@ public class BookController extends BaseController {
     /**
      * index页面中BootStrapTable请求列表响应
      *
-     * @parameter
+     * @parameter ???
      * @return Page<Book>
      */
     /*
@@ -340,7 +377,12 @@ public class BookController extends BaseController {
      * getPageRequest()); return page; }
      */
 
-    /** 前台查询图书 */
+    /**
+     * 前台查询图书
+     *
+     * @param request request
+     * @return Mono Page
+     */
     @RequestMapping(value = {"/findlist"})
     @ResponseBody
     public Mono<Page<Book>> findList(HttpServletRequest request) {

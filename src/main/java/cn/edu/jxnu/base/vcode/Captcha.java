@@ -38,6 +38,8 @@ public abstract class Captcha extends Randoms {
     /**
      * 给定范围获得随机颜色
      *
+     * @param fc fc
+     * @param bc bc
      * @return Color 随机颜色
      */
     protected Color color(int fc, int bc) {

@@ -29,7 +29,8 @@ public interface IBorrowBookService extends IBaseService<BorrowBook, String> {
      * 通过用户id和图书id查询借阅信息
      *
      * @return BorrowBook
-     * @parame userId 用户id bookId 图书id
+     * @param userId 用户id bookId 图书id
+     * @param bookId 书ID
      */
     BorrowBook findByUserIdAndBookId(int userId, String bookId);
 
@@ -37,7 +38,6 @@ public interface IBorrowBookService extends IBaseService<BorrowBook, String> {
      * 保存或修改借阅信息
      *
      * @param borrowBook 借阅信息
-     * @return void
      */
     void saveOrUpdate(BorrowBook borrowBook);
 
@@ -45,7 +45,7 @@ public interface IBorrowBookService extends IBaseService<BorrowBook, String> {
      * 通过用户id和图书id联合主键删除借阅信息
      *
      * @param userId 用户id bookId 图书id
-     * @return void
+     * @param bookId 书ID
      */
     void deletByUserIdAndBookId(int userId, String bookId);
 }
