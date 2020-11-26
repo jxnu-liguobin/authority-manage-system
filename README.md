@@ -1,5 +1,7 @@
 # SpringBoot WebFlux 2.0.3 版
 
+![Java CI with Maven](https://github.com/jxnu-liguobin/authority-manage-system/workflows/Java%20CI%20with%20Maven/badge.svg)
+
 ![](webflux.png)
 
 # 分支
