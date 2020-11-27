@@ -82,8 +82,7 @@ public class BookController extends BaseController {
     @ResponseBody
     public Mono<JsonResult> delete(@PathVariable String id, @RequestParam("uCode") String uCode) {
         try {
-            Flux<User> ls = userService.findAll();
-            ls.map(
+            userService.findAll().map(
                             user -> {
                                 // 得到所有用户，如果有，则不能删除
                                 List<String> bookIdList =
@@ -96,11 +95,10 @@ public class BookController extends BaseController {
                                         }
                                     }
                                 }
-                                return null;
+                                return Mono.empty();
                             })
                     .subscribe();
-            Mono<Book> tempMono = bookService.findByBookId(id);
-            tempMono.subscribe(
+            bookService.findByBookId(id).subscribe(
                     temp -> {
                         bookService.delete(id).subscribe();
                         userService
