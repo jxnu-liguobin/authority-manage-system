@@ -16,18 +16,18 @@ import reactor.core.publisher.Mono;
  */
 public interface IBaseService<T, ID extends Serializable> {
 
-    // 应该使用Optional
-    Mono<T> find(ID id);
+  // 应该使用Optional
+  Mono<T> find(ID id);
 
-    Flux<T> findAll();
+  Flux<T> findAll();
 
-    Mono<Page<T>> findAll(Specification<T> spec, Pageable pageable);
+  Mono<Page<T>> findAll(Specification<T> spec, Pageable pageable);
 
-    Mono<T> save(T entity);
+  Mono<T> save(T entity);
 
-    Mono<T> update(T entity);
+  Mono<T> update(T entity);
 
-    Mono<Boolean> delete(ID id);
+  Mono<Boolean> delete(ID id);
 
-    Mono<Void> delete(T entity);
+  Mono<Void> delete(T entity);
 }

@@ -16,49 +16,46 @@ import org.springframework.web.servlet.ModelAndView;
 @Component
 public class CommonIntercepter implements HandlerInterceptor {
 
-    /**
-     * 返回true
-     *
-     * @param request request
-     * @param response response
-     * @param handler handler
-     * @return true
-     */
-    @Override
-    public boolean preHandle(
-            HttpServletRequest request, HttpServletResponse response, Object handler) {
-        return true;
-    }
+  /**
+   * 返回true
+   *
+   * @param request request
+   * @param response response
+   * @param handler handler
+   * @return true
+   */
+  @Override
+  public boolean preHandle(
+      HttpServletRequest request, HttpServletResponse response, Object handler) {
+    return true;
+  }
 
-    /**
-     * 注册全局变量作为前台应用路径
-     *
-     * @param request request
-     * @param response response
-     * @param handler handler
-     * @param modelAndView modelAndView
-     */
-    @Override
-    public void postHandle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler,
-            ModelAndView modelAndView) {
-        request.setAttribute("ctx", request.getContextPath());
-    }
+  /**
+   * 注册全局变量作为前台应用路径
+   *
+   * @param request request
+   * @param response response
+   * @param handler handler
+   * @param modelAndView modelAndView
+   */
+  @Override
+  public void postHandle(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      Object handler,
+      ModelAndView modelAndView) {
+    request.setAttribute("ctx", request.getContextPath());
+  }
 
-    /**
-     * 请求之后需要处理的
-     *
-     * @param request request
-     * @param response response
-     * @param handler handler
-     * @param ex 异常
-     */
-    @Override
-    public void afterCompletion(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler,
-            Exception ex) {}
+  /**
+   * 请求之后需要处理的
+   *
+   * @param request request
+   * @param response response
+   * @param handler handler
+   * @param ex 异常
+   */
+  @Override
+  public void afterCompletion(
+      HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {}
 }

@@ -24,24 +24,24 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 public class RedisTest {
 
-    @Autowired private RedisService redisService;
+  @Autowired private RedisService redisService;
 
-    @Test
-    public void testRedis() throws Exception {
-        redisService.hashPushHashMap("base:0", 1, Arrays.asList("ddd"));
-        redisService.hashPushHashMap("base:0", 122, Arrays.asList("bbb"));
-        redisService.hashPushHashMap("base:0", 122, Arrays.asList("ccc"));
-        redisService.hashPushHashMap("base:0", 222, Arrays.asList("aaa"));
-        Map<Integer, List<String>> map = redisService.hashGetAll("base:0");
-        map.forEach(
-                (x, y) -> {
-                    if (y instanceof List) {
-                        System.out.println("List类型");
-                    }
-                    System.out.println("k:" + x + " - " + "v:" + y);
-                });
-        redisService.hashDeleteHashKey("base:0", 222);
-        List<String> i = redisService.hashGet("base:0", 122);
-        i.stream().forEach(System.out::print);
-    }
+  @Test
+  public void testRedis() throws Exception {
+    redisService.hashPushHashMap("base:0", 1, Arrays.asList("ddd"));
+    redisService.hashPushHashMap("base:0", 122, Arrays.asList("bbb"));
+    redisService.hashPushHashMap("base:0", 122, Arrays.asList("ccc"));
+    redisService.hashPushHashMap("base:0", 222, Arrays.asList("aaa"));
+    Map<Integer, List<String>> map = redisService.hashGetAll("base:0");
+    map.forEach(
+        (x, y) -> {
+          if (y instanceof List) {
+            System.out.println("List类型");
+          }
+          System.out.println("k:" + x + " - " + "v:" + y);
+        });
+    redisService.hashDeleteHashKey("base:0", 222);
+    List<String> i = redisService.hashGet("base:0", 122);
+    i.stream().forEach(System.out::print);
+  }
 }

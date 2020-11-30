@@ -15,28 +15,28 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class NotFoundExceptionImpl implements ErrorController {
-    private static final String ERROR_PATH = "/error";
+  private static final String ERROR_PATH = "/error";
 
-    @Override
-    public String getErrorPath() {
-        return ERROR_PATH;
-    }
+  @Override
+  public String getErrorPath() {
+    return ERROR_PATH;
+  }
 
-    /**
-     * 404 500 处理
-     *
-     * @param response response
-     * @return ModelAndView
-     */
-    @RequestMapping(value = ERROR_PATH)
-    public ModelAndView errorHtml(HttpServletResponse response) {
-        ModelAndView mView = new ModelAndView();
-        if (response.getStatus() == 404) {
-            mView.setViewName("/assets/404.html");
-        }
-        if (response.getStatus() == 500) {
-            mView.setViewName("/assets/500.html");
-        }
-        return mView;
+  /**
+   * 404 500 处理
+   *
+   * @param response response
+   * @return ModelAndView
+   */
+  @RequestMapping(value = ERROR_PATH)
+  public ModelAndView errorHtml(HttpServletResponse response) {
+    ModelAndView mView = new ModelAndView();
+    if (response.getStatus() == 404) {
+      mView.setViewName("/assets/404.html");
     }
+    if (response.getStatus() == 500) {
+      mView.setViewName("/assets/500.html");
+    }
+    return mView;
+  }
 }

@@ -20,129 +20,129 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RedisServiceImpl implements RedisService {
 
-    @Autowired private RedisTemplate<Object, ?> redisTemplate;
+  @Autowired private RedisTemplate<Object, ?> redisTemplate;
 
-    @Autowired private StringRedisTemplate stringRedisTemplate;
+  @Autowired private StringRedisTemplate stringRedisTemplate;
 
-    /**
-     * 添加map
-     *
-     * @param key key
-     * @param map map
-     * @return 是否添加成功
-     * @throws Exception 异常
-     */
-    public boolean putMap(String key, Map<Integer, List<String>> map) throws Exception {
+  /**
+   * 添加map
+   *
+   * @param key key
+   * @param map map
+   * @return 是否添加成功
+   * @throws Exception 异常
+   */
+  public boolean putMap(String key, Map<Integer, List<String>> map) throws Exception {
 
-        try {
-            HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
-            hashOps.putAll(key, map);
-        } catch (Exception e) {
-            log.error("缓存map失败key错误信息: {}", e.getMessage());
-            throw new Exception("缓存map失败key[" + key + ", error[" + e.getMessage() + "]", e);
-        }
-        return true;
+    try {
+      HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
+      hashOps.putAll(key, map);
+    } catch (Exception e) {
+      log.error("缓存map失败key错误信息: {}", e.getMessage());
+      throw new Exception("缓存map失败key[" + key + ", error[" + e.getMessage() + "]", e);
     }
+    return true;
+  }
 
-    /**
-     * 查询哈希表 hKey 中给定域 hashKey 的值.
-     *
-     * @param hKey hKey
-     * @param hashKey hashKey
-     * @return 给定K的V
-     */
-    @Override
-    public List<String> hashGet(String hKey, Integer hashKey) {
-        HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
-        List<String> i = hashOps.get(hKey, hashKey);
-        return i;
+  /**
+   * 查询哈希表 hKey 中给定域 hashKey 的值.
+   *
+   * @param hKey hKey
+   * @param hashKey hashKey
+   * @return 给定K的V
+   */
+  @Override
+  public List<String> hashGet(String hKey, Integer hashKey) {
+    HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
+    List<String> i = hashOps.get(hKey, hashKey);
+    return i;
+  }
+
+  /**
+   * 获取所有的KV散列值
+   *
+   * @param key key
+   * @return map集合
+   * @throws Exception 异常
+   */
+  @Override
+  public Map<Integer, List<String>> hashGetAll(String key) throws Exception {
+    Map<Integer, List<String>> map = null;
+    try {
+      HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
+      map = hashOps.entries(key);
+    } catch (Exception e) {
+      log.error("获取map失败错误信息：{}", e.getMessage());
+      throw new Exception("根据key[" + key + "获取map失败，,error[" + e.getMessage() + "]", e);
     }
+    return map;
+  }
 
-    /**
-     * 获取所有的KV散列值
-     *
-     * @param key key
-     * @return map集合
-     * @throws Exception 异常
-     */
-    @Override
-    public Map<Integer, List<String>> hashGetAll(String key) throws Exception {
-        Map<Integer, List<String>> map = null;
-        try {
-            HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
-            map = hashOps.entries(key);
-        } catch (Exception e) {
-            log.error("获取map失败错误信息：{}", e.getMessage());
-            throw new Exception("根据key[" + key + "获取map失败，,error[" + e.getMessage() + "]", e);
-        }
-        return map;
+  /**
+   * 添加键值对到哈希表key中
+   *
+   * @param key key
+   * @param hashKey hashKey
+   * @param value value
+   */
+  @Override
+  public void hashPushHashMap(String key, Integer hashKey, List<String> value) {
+
+    HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
+    hashOps.put(key, hashKey, value);
+  }
+
+  /**
+   * 获取哈希表key中的所有域
+   *
+   * @param key key
+   * @return map的key set集合
+   */
+  @Override
+  public Set<Object> hashGetAllHashKey(String key) {
+    return null;
+  }
+
+  /**
+   * 删除一个或多个哈希字段
+   *
+   * @param key key
+   * @param hashKeys hashKeys
+   * @return 成功删除的个数
+   */
+  @Override
+  public Long hashDeleteHashKey(String key, Object... hashKeys) {
+    long result = 0l;
+    HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
+    if (hashOps.hasKey(key, hashKeys)) {
+      result = hashOps.delete(key, hashKeys);
     }
+    return result;
+  }
 
-    /**
-     * 添加键值对到哈希表key中
-     *
-     * @param key key
-     * @param hashKey hashKey
-     * @param value value
-     */
-    @Override
-    public void hashPushHashMap(String key, Integer hashKey, List<String> value) {
+  @Override
+  public String get(String key) {
+    return stringRedisTemplate.opsForValue().get(key);
+  }
 
-        HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
-        hashOps.put(key, hashKey, value);
+  @Override
+  public void set(String key, String value, long liveTime) {
+    stringRedisTemplate.opsForValue().set(key, value); // expired无法监听这个
+    stringRedisTemplate.expire(key, liveTime, TimeUnit.SECONDS);
+  }
+
+  @Override
+  public void set(String key, String value) {
+    stringRedisTemplate.opsForValue().set(key, value);
+  }
+
+  @Override
+  public boolean del(String key) {
+    try {
+      stringRedisTemplate.delete(key);
+    } catch (Exception e) {
+      log.info("redis删除key失败");
     }
-
-    /**
-     * 获取哈希表key中的所有域
-     *
-     * @param key key
-     * @return map的key set集合
-     */
-    @Override
-    public Set<Object> hashGetAllHashKey(String key) {
-        return null;
-    }
-
-    /**
-     * 删除一个或多个哈希字段
-     *
-     * @param key key
-     * @param hashKeys hashKeys
-     * @return 成功删除的个数
-     */
-    @Override
-    public Long hashDeleteHashKey(String key, Object... hashKeys) {
-        long result = 0l;
-        HashOperations<Object, Integer, List<String>> hashOps = redisTemplate.opsForHash();
-        if (hashOps.hasKey(key, hashKeys)) {
-            result = hashOps.delete(key, hashKeys);
-        }
-        return result;
-    }
-
-    @Override
-    public String get(String key) {
-        return stringRedisTemplate.opsForValue().get(key);
-    }
-
-    @Override
-    public void set(String key, String value, long liveTime) {
-        stringRedisTemplate.opsForValue().set(key, value); // expired无法监听这个
-        stringRedisTemplate.expire(key, liveTime, TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void set(String key, String value) {
-        stringRedisTemplate.opsForValue().set(key, value);
-    }
-
-    @Override
-    public boolean del(String key) {
-        try {
-            stringRedisTemplate.delete(key);
-        } catch (Exception e) {
-            log.info("redis删除key失败");
-        }
-        return true;
-    }
+    return true;
+  }
 }

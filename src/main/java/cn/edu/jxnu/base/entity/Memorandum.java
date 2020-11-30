@@ -26,33 +26,33 @@ import lombok.ToString;
 @ToString // 添加toString测试用
 public class Memorandum extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public Memorandum(int id, Date time, String userCode, String userName, String resourceName) {
-        this.id = id;
-        this.time = time;
-        this.userCode = userCode;
-        this.userName = userName;
-        this.resourceName = resourceName;
-    }
+  public Memorandum(int id, Date time, String userCode, String userName, String resourceName) {
+    this.id = id;
+    this.time = time;
+    this.userCode = userCode;
+    this.userName = userName;
+    this.resourceName = resourceName;
+  }
 
-    public Memorandum() {}
+  public Memorandum() {}
 
-    /** id */
-    @Id
-    @Column(name = "id", nullable = false)
-    private Integer id;
+  /** id */
+  @Id
+  @Column(name = "id", nullable = false)
+  private Integer id;
 
-    /** 操作时间 */
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    private Date time;
+  /** 操作时间 */
+  @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+  private Date time;
 
-    /** 操作人账号 */
-    private String userCode;
+  /** 操作人账号 */
+  private String userCode;
 
-    /** 操作人姓名 */
-    private String userName;
+  /** 操作人姓名 */
+  private String userName;
 
-    /** 操作名称. */
-    private String resourceName;
+  /** 操作名称. */
+  private String resourceName;
 }

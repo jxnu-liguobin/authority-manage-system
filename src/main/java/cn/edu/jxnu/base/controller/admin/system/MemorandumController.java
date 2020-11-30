@@ -30,57 +30,50 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/admin/memorandum")
 public class MemorandumController extends BaseController {
 
-    @Autowired private IMemorandumService memorandumService;
+  @Autowired private IMemorandumService memorandumService;
 
-    /**
-     * 打开备忘录首页
-     *
-     * @return String
-     */
-    @RequestMapping("/index")
-    public String index() {
-        return "admin/memorandum/index";
-    }
+  /**
+   * 打开备忘录首页
+   *
+   * @return String
+   */
+  @RequestMapping("/index")
+  public String index() {
+    return "admin/memorandum/index";
+  }
 
-    /**
-     * 分页
-     *
-     * @param request request
-     * @return Mono Page
-     */
-    @RequestMapping(value = "/list")
-    @ResponseBody
-    public Mono<Page<Memorandum>> list(HttpServletRequest request) {
-        SimpleSpecificationBuilder<Memorandum> builder = new SimpleSpecificationBuilder<>();
-        String searchText = request.getParameter("searchText");
-        if (StringUtils.isNotBlank(searchText)) {
-            builder.add("userName", Operator.likeAll.name(), searchText);
-        }
-        Mono<Page<Memorandum>> page =
-                memorandumService.findAll(builder.generateSpecification(), getPageRequest(request));
-        return page.map(
-                p -> {
-                    log.info("Memorandum: {}", p.getSize());
-                    return p;
-                });
+  /**
+   * 分页
+   *
+   * @param request request
+   * @return Mono Page
+   */
+  @RequestMapping(value = "/list")
+  @ResponseBody
+  public Mono<Page<Memorandum>> list(HttpServletRequest request) {
+    SimpleSpecificationBuilder<Memorandum> builder = new SimpleSpecificationBuilder<>();
+    String searchText = request.getParameter("searchText");
+    if (StringUtils.isNotBlank(searchText)) {
+      builder.add("userName", Operator.likeAll.name(), searchText);
     }
+    return memorandumService
+        .findAll(builder.generateSpecification(), getPageRequest(request))
+        .log();
+  }
 
-    /**
-     * 删除
-     *
-     * @param id id
-     * @return Mono JsonResult
-     */
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
-    @ResponseBody
-    public Mono<JsonResult> delete(@PathVariable Integer id) {
-        try {
-            memorandumService.delete(id).subscribe();
-            log.info("删除: {} 成功", id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Mono.just(JsonResult.failure(e.getMessage()));
-        }
-        return Mono.just(JsonResult.success());
-    }
+  /**
+   * 删除
+   *
+   * @param id id
+   * @return Mono JsonResult
+   */
+  @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
+  @ResponseBody
+  public Mono<JsonResult> delete(@PathVariable Integer id) {
+    return memorandumService
+        .delete(id)
+        .map(t -> t ? JsonResult.success() : JsonResult.failure("删除失败"))
+        .log()
+        .onErrorResume(error -> Mono.just(JsonResult.failure(error.getLocalizedMessage())));
+  }
 }

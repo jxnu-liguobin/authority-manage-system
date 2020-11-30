@@ -17,78 +17,72 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public class SimpleSpecification<T> implements Specification<T> {
 
-    /** 查询的条件列表，是一组列表 */
-    private List<SpecificationOperator> opers;
+  /** 查询的条件列表，是一组列表 */
+  private List<SpecificationOperator> opers;
 
-    SimpleSpecification(List<SpecificationOperator> opers) {
-        this.opers = opers;
+  SimpleSpecification(List<SpecificationOperator> opers) {
+    this.opers = opers;
+  }
+
+  /**
+   * 重写toPredicate，构造查询条件
+   *
+   * @param root root
+   * @param criteriaQuery criteriaQuery
+   * @param criteriaBuilder criteriaBuilder
+   * @return Predicate
+   */
+  @Override
+  public Predicate toPredicate(
+      Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+    int index = 0;
+    // 通过resultPre来组合多个条件
+    Predicate resultPre = null;
+    for (SpecificationOperator op : opers) {
+      if (index++ == 0) {
+        resultPre = generatePredicate(root, criteriaBuilder, op);
+        continue;
+      }
+      Predicate pre = generatePredicate(root, criteriaBuilder, op);
+      if (pre == null) continue;
+      if (Join.and.name().equalsIgnoreCase(op.getJoin())) {
+        resultPre = criteriaBuilder.and(resultPre, pre);
+      } else if (Join.or.name().equalsIgnoreCase(op.getJoin())) {
+        resultPre = criteriaBuilder.or(resultPre, pre);
+      }
     }
+    return resultPre;
+  }
 
-    /**
-     * 重写toPredicate，构造查询条件
-     *
-     * @param root root
-     * @param criteriaQuery criteriaQuery
-     * @param criteriaBuilder criteriaBuilder
-     * @return Predicate
+  private Predicate generatePredicate(
+      Root<T> root, CriteriaBuilder criteriaBuilder, SpecificationOperator op) {
+    /*
+     * 根据不同的操作符返回特定的查询
      */
-    @Override
-    public Predicate toPredicate(
-            Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-        int index = 0;
-        // 通过resultPre来组合多个条件
-        Predicate resultPre = null;
-        for (SpecificationOperator op : opers) {
-            if (index++ == 0) {
-                resultPre = generatePredicate(root, criteriaBuilder, op);
-                continue;
-            }
-            Predicate pre = generatePredicate(root, criteriaBuilder, op);
-            if (pre == null) continue;
-            if (Join.and.name().equalsIgnoreCase(op.getJoin())) {
-                resultPre = criteriaBuilder.and(resultPre, pre);
-            } else if (Join.or.name().equalsIgnoreCase(op.getJoin())) {
-                resultPre = criteriaBuilder.or(resultPre, pre);
-            }
-        }
-        return resultPre;
+    if (SpecificationOperator.Operator.eq.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.equal(root.get(op.getKey()), op.getValue());
+    } else if (SpecificationOperator.Operator.ge.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.ge(root.get(op.getKey()).as(Number.class), (Number) op.getValue());
+    } else if (SpecificationOperator.Operator.le.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.le(root.get(op.getKey()).as(Number.class), (Number) op.getValue());
+    } else if (SpecificationOperator.Operator.gt.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.gt(root.get(op.getKey()).as(Number.class), (Number) op.getValue());
+    } else if (SpecificationOperator.Operator.lt.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.lt(root.get(op.getKey()).as(Number.class), (Number) op.getValue());
+    } else if (SpecificationOperator.Operator.likeAll.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.like(
+          root.get(op.getKey()).as(String.class), "%" + op.getValue() + "%");
+    } else if (SpecificationOperator.Operator.likeL.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.like(root.get(op.getKey()).as(String.class), op.getValue() + "%");
+    } else if (SpecificationOperator.Operator.likeR.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.like(root.get(op.getKey()).as(String.class), "%" + op.getValue());
+    } else if (SpecificationOperator.Operator.isNull.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.isNull(root.get(op.getKey()));
+    } else if (SpecificationOperator.Operator.isNotNull.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.isNotNull(root.get(op.getKey()));
+    } else if (SpecificationOperator.Operator.notEqual.name().equalsIgnoreCase(op.getOper())) {
+      return criteriaBuilder.notEqual(root.get(op.getKey()), op.getValue());
     }
-
-    private Predicate generatePredicate(
-            Root<T> root, CriteriaBuilder criteriaBuilder, SpecificationOperator op) {
-        /*
-         * 根据不同的操作符返回特定的查询
-         */
-        if (SpecificationOperator.Operator.eq.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.equal(root.get(op.getKey()), op.getValue());
-        } else if (SpecificationOperator.Operator.ge.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.ge(
-                    root.get(op.getKey()).as(Number.class), (Number) op.getValue());
-        } else if (SpecificationOperator.Operator.le.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.le(
-                    root.get(op.getKey()).as(Number.class), (Number) op.getValue());
-        } else if (SpecificationOperator.Operator.gt.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.gt(
-                    root.get(op.getKey()).as(Number.class), (Number) op.getValue());
-        } else if (SpecificationOperator.Operator.lt.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.lt(
-                    root.get(op.getKey()).as(Number.class), (Number) op.getValue());
-        } else if (SpecificationOperator.Operator.likeAll.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.like(
-                    root.get(op.getKey()).as(String.class), "%" + op.getValue() + "%");
-        } else if (SpecificationOperator.Operator.likeL.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.like(
-                    root.get(op.getKey()).as(String.class), op.getValue() + "%");
-        } else if (SpecificationOperator.Operator.likeR.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.like(
-                    root.get(op.getKey()).as(String.class), "%" + op.getValue());
-        } else if (SpecificationOperator.Operator.isNull.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.isNull(root.get(op.getKey()));
-        } else if (SpecificationOperator.Operator.isNotNull.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.isNotNull(root.get(op.getKey()));
-        } else if (SpecificationOperator.Operator.notEqual.name().equalsIgnoreCase(op.getOper())) {
-            return criteriaBuilder.notEqual(root.get(op.getKey()), op.getValue());
-        }
-        return null;
-    }
+    return null;
+  }
 }

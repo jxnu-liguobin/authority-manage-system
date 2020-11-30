@@ -25,51 +25,51 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class User extends BaseEntity {
 
-    private static final long serialVersionUID = 2401834536131259473L;
+  private static final long serialVersionUID = 2401834536131259473L;
 
-    /** 用户id */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+  /** 用户id */
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "id", nullable = false)
+  private Integer id;
 
-    // Scala 有可能会因为编译顺序问题，找不到get方法,此时可以自己加，也可以改变Eclipse编译顺序
+  // Scala 有可能会因为编译顺序问题，找不到get方法,此时可以自己加，也可以改变Eclipse编译顺序
 
-    /** 学号 */
-    private String userCode;
-    /** 真实姓名 */
-    private String userName;
+  /** 学号 */
+  private String userCode;
+  /** 真实姓名 */
+  private String userName;
 
-    /** 用户密码 */
-    private String password;
+  /** 用户密码 */
+  private String password;
 
-    /** 电话 */
-    private String telephone;
+  /** 电话 */
+  private String telephone;
 
-    /** 逻辑删除状态 0 未删除 1 删除 */
-    private Integer deleteStatus;
+  /** 逻辑删除状态 0 未删除 1 删除 */
+  private Integer deleteStatus;
 
-    /**
-     * 是否锁定
-     *
-     * <p>0 未锁定 1 锁定
-     */
-    private Integer locked;
+  /**
+   * 是否锁定
+   *
+   * <p>0 未锁定 1 锁定
+   */
+  private Integer locked;
 
-    /** 创建时间 */
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+  /** 创建时间 */
+  @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+  private Date createTime;
 
-    /** 更新时间 */
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
-    /** 用户-角色 多对多关系，设置级联删除，懒加载，中间表tb_user_role，[user_id-role_id] */
-    @ManyToMany(
-            cascade = {CascadeType.REFRESH},
-            fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "tb_user_role",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private java.util.Set<Role> roles;
+  /** 更新时间 */
+  @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+  private Date updateTime;
+  /** 用户-角色 多对多关系，设置级联删除，懒加载，中间表tb_user_role，[user_id-role_id] */
+  @ManyToMany(
+      cascade = {CascadeType.REFRESH},
+      fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "tb_user_role",
+      joinColumns = {@JoinColumn(name = "user_id")},
+      inverseJoinColumns = {@JoinColumn(name = "role_id")})
+  private java.util.Set<Role> roles;
 }

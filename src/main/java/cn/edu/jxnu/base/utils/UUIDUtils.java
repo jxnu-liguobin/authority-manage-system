@@ -11,12 +11,12 @@ import java.util.UUID;
  */
 public class UUIDUtils {
 
-    /**
-     * 静态工具方法
-     *
-     * @return String
-     */
-    public static String makeID() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
-    }
+  /**
+   * 静态工具方法
+   *
+   * @return String
+   */
+  public static String makeID() {
+    return UUID.randomUUID().toString().replaceAll("-", "");
+  }
 }

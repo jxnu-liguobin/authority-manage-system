@@ -10,15 +10,15 @@ import cn.edu.jxnu.base.service.IBorrowBookService;
 import cn.edu.jxnu.base.service.IRoleService;
 import cn.edu.jxnu.base.service.IUserService;
 import cn.edu.jxnu.base.utils.MD5Utils;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -32,138 +32,157 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements IUserService {
 
-    @Autowired private IUserDao userDao;
+  @Autowired private IUserDao userDao;
 
-    @Autowired private IRoleService roleService;
+  @Autowired private IRoleService roleService;
 
-    @Autowired private IBorrowBookService borrowBookService;
+  @Autowired private IBorrowBookService borrowBookService;
 
-    @Override
-    public IBaseDao<User, Integer> baseDao() {
-        return this.userDao;
+  @Override
+  public IBaseDao<User, Integer> baseDao() {
+    return this.userDao;
+  }
+
+  @Override
+  public Mono<User> findByUserName(String username) {
+    log.info("findByUserName: " + username);
+    return Mono.justOrEmpty(userDao.findByUserName(username));
+  }
+
+  @Override
+  public Mono<User> findByUserCode(String usercode) {
+    log.info("findByUserCode: " + usercode);
+    return Mono.justOrEmpty(userDao.findByUserCode(usercode));
+  }
+
+  @Override
+  public Mono<User> saveOrUpdate(final User user) {
+    if (user.getId() != null) {
+      return find(user.getId())
+          .flatMap(
+              dbUser -> {
+                dbUser.setUserName(user.getUserName());
+                // 20是前端的密码最大长度，考虑不周
+                if (user.getPassword().length() < 20) {
+                  // 避免二次加密
+                  dbUser.setPassword(MD5Utils.md5(user.getPassword()));
+                }
+                dbUser.setTelephone(user.getTelephone());
+                dbUser.setLocked(user.getLocked());
+                dbUser.setUpdateTime(new Date());
+                log.info("userinfo: " + user.toString());
+                return update(dbUser);
+              })
+          .log();
+    } else {
+      user.setCreateTime(new Date());
+      user.setUpdateTime(new Date());
+      user.setDeleteStatus(0);
+      user.setPassword(MD5Utils.md5(user.getPassword()));
+      // 设定默认分权为学生权限
+      return roleService
+          .find(2)
+          .flatMap(
+              r -> {
+                Set<Role> roles = new HashSet<Role>();
+                roles.add(r);
+                user.setRoles(roles);
+                return save(user);
+              });
     }
+  }
 
-    @Override
-    public Mono<User> findByUserName(String username) {
-        log.info("findByUserName: " + username);
-        return Mono.justOrEmpty(userDao.findByUserName(username));
-    }
+  /** 删除分两种：真正删除和转换为设置一个删除标志位，数据仍然保存 */
+  @Override
+  public Mono<Boolean> delete(Integer id) {
+    return find(id)
+        .flatMap(
+            user -> {
+              if ("admin".equals(user.getUserName())) {
+                throw new RuntimeException("超级管理员用户不能删除");
+              }
+              if (user.getDeleteStatus() == 1) {
+                BorrowBook[] u = borrowBookService.findByUserId(id);
+                // 用户借过书，不允许直接删除信息。
+                if (u.length == 0) {
+                  throw new RuntimeException("用户还有借书记录，请还书后操作");
+                }
+                // 已被删除的，此次将真的删除。
+                user.setUpdateTime(new Date());
+                return delete(user).flatMap(f -> Mono.just(true));
+              } else {
+                // 置位1
+                user.setDeleteStatus(1);
+                user.setUpdateTime(new Date());
+                return update(user).map(Objects::nonNull);
+              }
+            });
+  }
 
-    @Override
-    public Mono<User> findByUserCode(String usercode) {
-        log.info("findByUserCode: " + usercode);
-        return Mono.justOrEmpty(userDao.findByUserCode(usercode));
-    }
+  /**
+   * 授权管理
+   *
+   * @param id 用户ID
+   * @param roleIds 角色ID
+   * @return Mono User
+   */
+  @Override
+  public Mono<User> grant(Integer id, String[] roleIds) {
+    return find(id)
+        .flatMap(
+            user -> {
+              if (user == null) {
+                throw new RuntimeException("用户不存在");
+              }
+              if ("admin".equals(user.getUserName())) {
+                throw new RuntimeException("超级管理员用户不能修改管理角色");
+              }
+              if (roleIds != null) {
+                Flux.fromArray(roleIds)
+                    .flatMap(
+                        x ->
+                            roleService
+                                .find(Integer.parseInt(x))
+                                .map(
+                                    r -> {
+                                      if (r.getId() == 0) {
+                                        return new RuntimeException("角色已被禁用，无法进行该操作");
+                                      } else {
+                                        return true;
+                                      }
+                                    }))
+                    .all(c -> true)
+                    .map(can -> isCanDelete(can, roleIds, user));
+              }
+              return Mono.just(user);
+            })
+        .log();
+  }
 
-    @Override
-    public Mono<User> saveOrUpdate(final User user) {
-        log.info("saveOrUpdate: " + user);
-        if (user.getId() != null) {
-            return find(user.getId())
-                    .map(
-                            dbUser -> {
-                                dbUser.setUserName(user.getUserName());
-                                // 20是前端的密码最大长度，考虑不周
-                                if (user.getPassword().length() < 20) {
-                                    // 避免二次加密
-                                    dbUser.setPassword(MD5Utils.md5(user.getPassword()));
-                                }
-                                dbUser.setTelephone(user.getTelephone());
-                                dbUser.setLocked(user.getLocked());
-                                dbUser.setUpdateTime(new Date());
-                                log.info("userinfo: " + user.toString());
-                                update(dbUser).subscribe();
-                                return dbUser;
-                            });
-        } else {
-            user.setCreateTime(new Date());
-            user.setUpdateTime(new Date());
-            user.setDeleteStatus(0);
-            user.setPassword(MD5Utils.md5(user.getPassword()));
-            // 设定默认分权为学生权限
-            Set<Role> roles = new HashSet<Role>();
-            Mono<Role> role = roleService.find(2);
-            role.map(roles::add).subscribe();
-            user.setRoles(roles);
-            log.info("userinfo: " + user.toString());
-            return save(user);
-        }
-    }
-
-    /** 删除分两种：真正删除和转换为设置一个删除标志位，数据仍然保存 */
-    @Override
-    public Mono<Boolean> delete(Integer id) {
-        log.info("delete: " + id);
-        return find(id).map(
-                        user -> {
-                            // false抛异常
-                            // Assert.state(user.getDeleteStatus() == 0, "已删除用户不可重复删除");
-                            Assert.state(!"admin".equals(user.getUserName()), "超级管理员用户不能删除");
-                            // super.delete(id);
-                            if (user.getDeleteStatus() == 1) {
-                                BorrowBook[] u = borrowBookService.findByUserId(id);
-                                // 用户借过书，不允许直接删除信息。
-                                Assert.state((u.length == 0), "用户还有借书记录，请还书后操作");
-                                // 已被删除的，此次将真的删除。
-                                user.setUpdateTime(new Date());
-                                delete(user).subscribe();
-                            } else {
-                                // 置位1
-                                user.setDeleteStatus(1);
-                                user.setUpdateTime(new Date());
-                                update(user).subscribe();
-                            }
-                            return true;
-                        });
-    }
-
-    /**
-     * 授权管理
-     *
-     * @param id 用户ID
-     * @param roleIds 角色ID
-     * @return Mono User
-     */
-    @Override
-    public Mono<User> grant(Integer id, String[] roleIds) {
-        log.info("grant: " + id);
-        return find(id).map(
-                        user -> {
-                            Assert.notNull(user, "用户不存在");
-                            Assert.state(!"admin".equals(user.getUserName()), "超级管理员用户不能修改管理角色");
-                            Set<Role> roles = new HashSet<>();
-                            if (roleIds != null) {
-                                Arrays.stream(roleIds)
-                                        .forEach(
-                                                x -> {
-                                                    // 已删除的不可分配
-                                                    roleService
-                                                            .find(Integer.parseInt(x))
-                                                            .subscribe(
-                                                                    r -> {
-                                                                        log.info(
-                                                                                "role->Id: "
-                                                                                        + r
-                                                                                                .toString());
-                                                                        Assert.state(
-                                                                                r.getStatus() == 0,
-                                                                                "角色已被禁用，无法进行该操作");
-                                                                    });
-                                                });
-                                Arrays.stream(roleIds)
-                                        .forEach(
-                                                x -> {
-                                                    Integer rid = Integer.parseInt(x);
-                                                    roleService
-                                                            .find(rid)
-                                                            .map(roles::add)
-                                                            .subscribe();
-                                                });
-                            }
-
+  private Mono<User> isCanDelete(boolean can, String[] roleIds, User user) {
+    if (can) {
+      return Flux.fromArray(roleIds)
+          .collectList()
+          .map(
+              x -> {
+                Set<Role> roles = new HashSet<>();
+                for (String rId : x) {
+                  Integer rid = Integer.parseInt(rId);
+                  roleService
+                      .find(rid)
+                      .map(
+                          r -> {
+                            roles.add(r);
                             user.setRoles(roles);
-                            update(user).subscribe();
-                            return user;
-                        });
+                            return update(user);
+                          })
+                      .log()
+                      .subscribe();
+                }
+                return user;
+              });
+    } else {
+      return Mono.just(user);
     }
+  }
 }

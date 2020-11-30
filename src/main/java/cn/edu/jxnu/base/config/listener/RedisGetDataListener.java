@@ -26,45 +26,45 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class RedisGetDataListener implements ServletContextListener {
 
-    @Autowired private RedisService redisService;
+  @Autowired private RedisService redisService;
 
-    @Autowired private IBorrowBookService borrowBookService;
+  @Autowired private IBorrowBookService borrowBookService;
 
-    /**
-     * 容器初始化
-     *
-     * @param sce servlet 上下文
-     */
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        log.info("开始初始化redis数据");
-        Map<Integer, List<String>> map = new HashMap<>();
-        Flux<BorrowBook> listBook = borrowBookService.findAll();
-        listBook.subscribe(
-                borrowBook -> {
-                    // 启动的时候将数据放进redis中
-                    List<String> sList;
-                    if (map.containsKey(borrowBook.getUserId())) {
-                        sList = map.get(borrowBook.getUserId());
-                        sList.add(borrowBook.getBookId());
-                        map.put(borrowBook.getUserId(), sList);
-                    } else {
-                        // 本来没有这条记录
-                        sList = new ArrayList<>();
-                        sList.add(borrowBook.getBookId());
-                        map.put(borrowBook.getUserId(), sList);
-                    }
-                });
-        try {
-            // 放进redis中
-            redisService.putMap(Constats.BOOK_REDIS_KEY, map);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        log.info("初始化redis数据完毕");
+  /**
+   * 容器初始化
+   *
+   * @param sce servlet 上下文
+   */
+  @Override
+  public void contextInitialized(ServletContextEvent sce) {
+    log.info("开始初始化redis数据");
+    Map<Integer, List<String>> map = new HashMap<>();
+    Flux<BorrowBook> listBook = borrowBookService.findAll();
+    listBook.subscribe(
+        borrowBook -> {
+          // 启动的时候将数据放进redis中
+          List<String> sList;
+          if (map.containsKey(borrowBook.getUserId())) {
+            sList = map.get(borrowBook.getUserId());
+            sList.add(borrowBook.getBookId());
+            map.put(borrowBook.getUserId(), sList);
+          } else {
+            // 本来没有这条记录
+            sList = new ArrayList<>();
+            sList.add(borrowBook.getBookId());
+            map.put(borrowBook.getUserId(), sList);
+          }
+        });
+    try {
+      // 放进redis中
+      redisService.putMap(Constats.BOOK_REDIS_KEY, map);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+    log.info("初始化redis数据完毕");
+  }
 
-    /** @param sce servlet上下文 */
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {}
+  /** @param sce servlet上下文 */
+  @Override
+  public void contextDestroyed(ServletContextEvent sce) {}
 }

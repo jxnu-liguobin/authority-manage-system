@@ -20,28 +20,28 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class BorrowBook extends BaseEntity {
 
-    /** */
-    private static final long serialVersionUID = -7107955948085904241L;
+  /** */
+  private static final long serialVersionUID = -7107955948085904241L;
 
-    /** 用户id */
-    @Id
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+  /** 用户id */
+  @Id
+  @Column(name = "user_id", nullable = false)
+  private Integer userId;
 
-    /** 图书id */
-    @Id
-    @Column(name = "book_id", nullable = false)
-    private String bookId;
+  /** 图书id */
+  @Id
+  @Column(name = "book_id", nullable = false)
+  private String bookId;
 
-    /** 图书名 */
-    private String bookName;
+  /** 图书名 */
+  private String bookName;
 
-    /** 作者 */
-    private String bookAuthor;
+  /** 作者 */
+  private String bookAuthor;
 
-    /** 出版社 */
-    private String bookPress;
+  /** 出版社 */
+  private String bookPress;
 
-    /** 更新时间 */
-    private Date updateTime;
+  /** 更新时间 */
+  private Date updateTime;
 }

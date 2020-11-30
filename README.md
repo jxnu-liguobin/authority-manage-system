@@ -26,7 +26,7 @@
 - Services 异步
 - Dao 依赖于JDBC和ORM，暂未更改成异步
 - 移除Druid和多数据源
-- TODO 链式调用，尽量去掉显示调用`subscribe`
+- TODO 链式调用，尽量去掉显示调用`subscribe`（分支rm-subscribe）
 
 # 使用 
 

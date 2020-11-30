@@ -21,10 +21,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(basePackages = {"cn.edu.jxnu"})
 public class DataSourceConfig {
 
-    @Bean(name = "myDataSource")
-    @Qualifier("myDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource getMyDataSource() {
-        return DataSourceBuilder.create().build();
-    }
+  @Bean(name = "myDataSource")
+  @Qualifier("myDataSource")
+  @ConfigurationProperties(prefix = "spring.datasource")
+  public DataSource getMyDataSource() {
+    return DataSourceBuilder.create().build();
+  }
 }

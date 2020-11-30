@@ -20,42 +20,42 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Transactional
 public class BorrowBookServiceImpl extends BaseServiceImpl<BorrowBook, String>
-        implements IBorrowBookService {
+    implements IBorrowBookService {
 
-    @Autowired private IBorrowBookDao borrowBookDao;
+  @Autowired private IBorrowBookDao borrowBookDao;
 
-    @Override
-    public BorrowBook[] findByUserId(int userId) {
-        log.info("findByUserId: " + userId);
-        return borrowBookDao.findByUserId(userId);
-    }
+  @Override
+  public BorrowBook[] findByUserId(int userId) {
+    log.info("findByUserId: " + userId);
+    return borrowBookDao.findByUserId(userId);
+  }
 
-    @Override
-    public BorrowBook[] findByBookId(String bookId) {
-        log.info("findByBookId: " + bookId);
-        return borrowBookDao.findByBookId(bookId);
-    }
+  @Override
+  public BorrowBook[] findByBookId(String bookId) {
+    log.info("findByBookId: " + bookId);
+    return borrowBookDao.findByBookId(bookId);
+  }
 
-    @Override
-    public void saveOrUpdate(BorrowBook borrowBook) {
-        log.info("saveOrUpdate: " + borrowBook.toString());
-        save(borrowBook).subscribe();
-    }
+  @Override
+  public void saveOrUpdate(BorrowBook borrowBook) {
+    log.info("saveOrUpdate: " + borrowBook.toString());
+    save(borrowBook).subscribe();
+  }
 
-    @Override
-    public IBaseDao<BorrowBook, String> baseDao() {
-        return this.borrowBookDao;
-    }
+  @Override
+  public IBaseDao<BorrowBook, String> baseDao() {
+    return this.borrowBookDao;
+  }
 
-    @Override
-    public BorrowBook findByUserIdAndBookId(int userId, String bookId) {
-        log.info("findByUserIdAndBookId: " + userId + " - " + bookId);
-        return borrowBookDao.findByUserIdAndBookId(userId, bookId);
-    }
+  @Override
+  public BorrowBook findByUserIdAndBookId(int userId, String bookId) {
+    log.info("findByUserIdAndBookId: " + userId + " - " + bookId);
+    return borrowBookDao.findByUserIdAndBookId(userId, bookId);
+  }
 
-    @Override
-    public void deletByUserIdAndBookId(int userId, String bookId) {
-        log.info("deletByUserIdAndBookId: " + userId + " - " + bookId);
-        borrowBookDao.mDelet(userId, bookId);
-    }
+  @Override
+  public void deletByUserIdAndBookId(int userId, String bookId) {
+    log.info("deletByUserIdAndBookId: " + userId + " - " + bookId);
+    borrowBookDao.mDelet(userId, bookId);
+  }
 }

@@ -27,106 +27,104 @@ import java.util.Map;
  * @since 0.2
  */
 public class PrincipalTag extends SecureTag {
-    static final Logger log = Logger.getLogger("PrincipalTag");
+  static final Logger log = Logger.getLogger("PrincipalTag");
 
-    /** The type of principal to be retrieved, or null if the default principal should be used. */
-    String getType(@SuppressWarnings("rawtypes") Map params) {
-        return getParam(params, "type");
-    }
+  /** The type of principal to be retrieved, or null if the default principal should be used. */
+  String getType(@SuppressWarnings("rawtypes") Map params) {
+    return getParam(params, "type");
+  }
 
-    /**
-     * The property name to retrieve of the principal, or null if the <tt>toString()</tt> value
-     * should be used.
-     */
-    String getProperty(@SuppressWarnings("rawtypes") Map params) {
-        return getParam(params, "property");
-    }
+  /**
+   * The property name to retrieve of the principal, or null if the <tt>toString()</tt> value should
+   * be used.
+   */
+  String getProperty(@SuppressWarnings("rawtypes") Map params) {
+    return getParam(params, "property");
+  }
 
-    @Override
-    public void render(
-            Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body)
-            throws IOException, TemplateException {
-        String result = null;
+  @Override
+  public void render(
+      Environment env, @SuppressWarnings("rawtypes") Map params, TemplateDirectiveBody body)
+      throws IOException, TemplateException {
+    String result = null;
 
-        if (getSubject() != null) {
-            // Get the principal to print out
-            Object principal;
+    if (getSubject() != null) {
+      // Get the principal to print out
+      Object principal;
 
-            if (getType(params) == null) {
-                principal = getSubject().getPrincipal();
-            } else {
-                principal = getPrincipalFromClassName(params);
-            }
+      if (getType(params) == null) {
+        principal = getSubject().getPrincipal();
+      } else {
+        principal = getPrincipalFromClassName(params);
+      }
 
-            // Get the string value of the principal
-            if (principal != null) {
-                String property = getProperty(params);
+      // Get the string value of the principal
+      if (principal != null) {
+        String property = getProperty(params);
 
-                if (property == null) {
-                    result = principal.toString();
-                } else {
-                    result = getPrincipalProperty(principal, property);
-                }
-            }
+        if (property == null) {
+          result = principal.toString();
+        } else {
+          result = getPrincipalProperty(principal, property);
         }
-
-        // Print out the principal value if not null
-        if (result != null) {
-            try {
-                env.getOut().write(result);
-            } catch (IOException ex) {
-                throw new TemplateException(
-                        "Error writing [" + result + "] to Freemarker.", ex, env);
-            }
-        }
+      }
     }
 
-    @SuppressWarnings("unchecked")
-    Object getPrincipalFromClassName(@SuppressWarnings("rawtypes") Map params) {
-        String type = getType(params);
+    // Print out the principal value if not null
+    if (result != null) {
+      try {
+        env.getOut().write(result);
+      } catch (IOException ex) {
+        throw new TemplateException("Error writing [" + result + "] to Freemarker.", ex, env);
+      }
+    }
+  }
 
-        try {
-            @SuppressWarnings("rawtypes")
-            Class cls = Class.forName(type);
+  @SuppressWarnings("unchecked")
+  Object getPrincipalFromClassName(@SuppressWarnings("rawtypes") Map params) {
+    String type = getType(params);
 
-            return getSubject().getPrincipals().oneByType(cls);
-        } catch (ClassNotFoundException ex) {
-            log.error("Unable to find class for name [" + type + "]", ex);
-        }
+    try {
+      @SuppressWarnings("rawtypes")
+      Class cls = Class.forName(type);
 
-        return null;
+      return getSubject().getPrincipals().oneByType(cls);
+    } catch (ClassNotFoundException ex) {
+      log.error("Unable to find class for name [" + type + "]", ex);
     }
 
-    String getPrincipalProperty(Object principal, String property) throws TemplateModelException {
-        try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(principal.getClass());
+    return null;
+  }
 
-            // Loop through the properties to get the string value of the
-            // specified property
-            for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
-                if (propertyDescriptor.getName().equals(property)) {
-                    Object value =
-                            propertyDescriptor.getReadMethod().invoke(principal, (Object[]) null);
+  String getPrincipalProperty(Object principal, String property) throws TemplateModelException {
+    try {
+      BeanInfo beanInfo = Introspector.getBeanInfo(principal.getClass());
 
-                    return String.valueOf(value);
-                }
-            }
+      // Loop through the properties to get the string value of the
+      // specified property
+      for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
+        if (propertyDescriptor.getName().equals(property)) {
+          Object value = propertyDescriptor.getReadMethod().invoke(principal, (Object[]) null);
 
-            // property not found, throw
-            throw new TemplateModelException(
-                    "Property ["
-                            + property
-                            + "] not found in principal of type ["
-                            + principal.getClass().getName()
-                            + "]");
-        } catch (Exception ex) {
-            throw new TemplateModelException(
-                    "Error reading property ["
-                            + property
-                            + "] from principal of type ["
-                            + principal.getClass().getName()
-                            + "]",
-                    ex);
+          return String.valueOf(value);
         }
+      }
+
+      // property not found, throw
+      throw new TemplateModelException(
+          "Property ["
+              + property
+              + "] not found in principal of type ["
+              + principal.getClass().getName()
+              + "]");
+    } catch (Exception ex) {
+      throw new TemplateModelException(
+          "Error reading property ["
+              + property
+              + "] from principal of type ["
+              + principal.getClass().getName()
+              + "]",
+          ex);
     }
+  }
 }

@@ -31,106 +31,117 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/admin/resource")
 public class ResourceController extends BaseController {
 
-    @Autowired private IResourceService resourceService;
+  @Autowired private IResourceService resourceService;
 
-    /**
-     * 资源树
-     *
-     * @param resourceId 资源ID
-     * @return Flux ZtreeView
-     */
-    @RequestMapping("/tree/{resourceId}")
-    @ResponseBody
-    public Flux<ZtreeView> tree(@PathVariable Integer resourceId) {
-        return resourceService.tree(resourceId);
-    }
+  /**
+   * 资源树
+   *
+   * @param resourceId 资源ID
+   * @return Flux ZtreeView
+   */
+  @RequestMapping("/tree/{resourceId}")
+  @ResponseBody
+  public Flux<ZtreeView> tree(@PathVariable Integer resourceId) {
+    return resourceService.tree(resourceId);
+  }
 
-    /**
-     * 打开资源管理首页
-     *
-     * @return String
-     */
-    @RequestMapping("/index")
-    public String index() {
-        return "admin/resource/index";
-    }
+  /**
+   * 打开资源管理首页
+   *
+   * @return String
+   */
+  @RequestMapping("/index")
+  public String index() {
+    return "admin/resource/index";
+  }
 
-    /**
-     * 资源管理分页
-     *
-     * @param request request
-     * @return Mono Page
-     */
-    @RequestMapping(
-            value = "/list",
-            method = {RequestMethod.POST})
-    @ResponseBody
-    public Mono<Page<Resource>> list(HttpServletRequest request) {
-        SimpleSpecificationBuilder<Resource> builder = new SimpleSpecificationBuilder<>();
-        String searchText = request.getParameter("searchText");
-        if (StringUtils.isNotBlank(searchText)) {
-            builder.add("name", Operator.likeAll.name(), searchText);
-        }
-        return resourceService.findAll(builder.generateSpecification(), getPageRequest(request));
+  /**
+   * 资源管理分页
+   *
+   * @param request request
+   * @return Mono Page
+   */
+  @RequestMapping(
+      value = "/list",
+      method = {RequestMethod.POST})
+  @ResponseBody
+  public Mono<Page<Resource>> list(HttpServletRequest request) {
+    SimpleSpecificationBuilder<Resource> builder = new SimpleSpecificationBuilder<>();
+    String searchText = request.getParameter("searchText");
+    if (StringUtils.isNotBlank(searchText)) {
+      builder.add("name", Operator.likeAll.name(), searchText);
     }
+    return resourceService.findAll(builder.generateSpecification(), getPageRequest(request)).log();
+  }
 
-    /**
-     * 打开资源添加页面
-     *
-     * @param map map
-     * @return String
-     */
-    @RequestMapping(value = "/add")
-    public String add(ModelMap map) {
-        Flux<Resource> list = resourceService.findAll();
-        list.subscribe(l -> map.put("list", l));
-        return "admin/resource/form";
-    }
+  /**
+   * 打开资源添加页面
+   *
+   * @param map map
+   * @return String
+   */
+  @RequestMapping(value = "/add")
+  public String add(ModelMap map) {
+    Flux<Resource> list = resourceService.findAll();
+    list.log().subscribe(l -> map.put("list", l));
+    return "admin/resource/form";
+  }
 
-    /**
-     * 打开资源修改页面
-     *
-     * @param id 资源ID
-     * @param map map
-     * @return String
-     */
-    @RequestMapping(value = "/edit/{id}")
-    public String edit(@PathVariable Integer id, ModelMap map) {
-        Mono<Resource> resource = resourceService.find(id);
-        resource.subscribe(r -> map.put("resource", r));
-        Flux<Resource> list = resourceService.findAll();
-        list.subscribe(l -> map.put("list", l));
-        return "admin/resource/form";
-    }
+  /**
+   * 打开资源修改页面
+   *
+   * @param id 资源ID
+   * @param map map
+   * @return String
+   */
+  @RequestMapping(value = "/edit/{id}")
+  public String edit(@PathVariable Integer id, ModelMap map) {
+    resourceService
+        .find(id)
+        .map(
+            r -> {
+              map.put("resource", r);
+              return resourceService.findAll().collectList().map(l -> map.put("list", l));
+            })
+        .log()
+        .subscribe();
+    return "admin/resource/form";
+  }
 
-    /**
-     * 资源添加或修改
-     *
-     * @param resource 资源
-     * @return Mono JsonResult
-     */
-    @RequestMapping(
-            value = {"/edit"},
-            method = {RequestMethod.POST})
-    @ResponseBody
-    public Mono<JsonResult> edit(Resource resource) {
-        resourceService.saveOrUpdate(resource).subscribe();
-        // 可能存在需要在增加资源的时候默认给管理员增加权限
-        return Mono.just(JsonResult.success());
-    }
+  /**
+   * 资源添加或修改
+   *
+   * @param resource 资源
+   * @return Mono JsonResult
+   */
+  @RequestMapping(
+      value = {"/edit"},
+      method = {RequestMethod.POST})
+  @ResponseBody
+  public Mono<JsonResult> edit(Resource resource) {
+    // 可能存在需要在增加资源的时候默认给管理员增加权限
+    return resourceService
+        .saveOrUpdate(resource)
+        .map(r -> JsonResult.success())
+        .log()
+        .onErrorResume(error -> Mono.just(JsonResult.failure(error.getLocalizedMessage())));
+  }
 
-    /**
-     * 资源删除
-     *
-     * @param id 资源ID
-     * @return Mono JsonResult
-     */
-    @RequestMapping(
-            value = "/delete/{id}",
-            method = {RequestMethod.POST})
-    @ResponseBody
-    public Mono<JsonResult> delete(@PathVariable Integer id) {
-        resourceService.delete(id).subscribe();
-        return Mono.just(JsonResult.success());
-    }
+  /**
+   * 资源删除
+   *
+   * @param id 资源ID
+   * @return Mono JsonResult
+   */
+  @RequestMapping(
+      value = "/delete/{id}",
+      method = {RequestMethod.POST})
+  @ResponseBody
+  public Mono<JsonResult> delete(@PathVariable Integer id) {
+    return resourceService
+        .delete(id)
+        .map(r -> r ? JsonResult.success() : JsonResult.failure("删除失败"))
+        .log()
+        .onErrorResume(error -> Mono.just(JsonResult.failure(error.getLocalizedMessage())));
+  }
 }

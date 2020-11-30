@@ -12,20 +12,20 @@ import reactor.core.publisher.Mono;
  */
 public interface IRoleService extends IBaseService<Role, Integer> {
 
-    /**
-     * 添加或者修改角色
-     *
-     * @param role 角色
-     * @return Mono Role
-     */
-    Mono<Role> saveOrUpdate(Role role);
+  /**
+   * 添加或者修改角色
+   *
+   * @param role 角色
+   * @return Mono Role
+   */
+  Mono<Role> saveOrUpdate(Role role);
 
-    /**
-     * 给角色分配资源
-     *
-     * @param resourceIds 资源ID
-     * @param id 角色ID
-     * @return Mono Role
-     */
-    Mono<Role> grant(Integer id, String[] resourceIds);
+  /**
+   * 给角色分配资源
+   *
+   * @param resourceIds 资源ID
+   * @param id 角色ID
+   * @return Mono Role
+   */
+  Mono<Role> grant(Integer id, String[] resourceIds);
 }

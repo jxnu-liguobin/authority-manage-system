@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 
 /**
@@ -30,80 +29,92 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class RoleServiceImpl extends BaseServiceImpl<Role, Integer> implements IRoleService {
 
-    @Autowired private IRoleDao roleDao;
-    @Autowired private IResourceService resourceService;
-    @Autowired private IUserService userService;
+  @Autowired private IRoleDao roleDao;
+  @Autowired private IResourceService resourceService;
+  @Autowired private IUserService userService;
 
-    @Override
-    public IBaseDao<Role, Integer> baseDao() {
-        return this.roleDao;
+  @Override
+  public IBaseDao<Role, Integer> baseDao() {
+    return this.roleDao;
+  }
+
+  @Override
+  public Mono<Role> saveOrUpdate(final Role role) {
+    // 修改
+    if (role.getId() != null) {
+      return find(role.getId())
+          .flatMap(
+              dbRole -> {
+                dbRole.setUpdateTime(new Date());
+                dbRole.setName(role.getName());
+                dbRole.setDescription(role.getDescription());
+                dbRole.setUpdateTime(new Date());
+                dbRole.setStatus(role.getStatus());
+                return update(dbRole);
+              })
+          .log();
+    } else {
+      role.setCreateTime(new Date());
+      role.setUpdateTime(new Date());
+      return save(role).log();
     }
+  }
 
-    @Override
-    public Mono<Role> saveOrUpdate(final Role role) {
-        log.info("saveOrUpdate: " + role);
-        // 修改
-        if (role.getId() != null) {
-            return find(role.getId())
-                    .map(
-                            dbRole -> {
-                                dbRole.setUpdateTime(new Date());
-                                dbRole.setName(role.getName());
-                                dbRole.setDescription(role.getDescription());
-                                dbRole.setUpdateTime(new Date());
-                                dbRole.setStatus(role.getStatus());
-                                update(dbRole).subscribe();
-                                return dbRole;
-                            });
-        } else {
-            role.setCreateTime(new Date());
-            role.setUpdateTime(new Date());
-            return save(role);
-        }
-    }
+  @Override
+  public Mono<Boolean> delete(Integer id) {
+    Mono<Role> roleMono = find(id);
+    return roleMono.flatMap(
+        role -> {
+          if ("administrator".equals(role.getRoleKey())) {
+            throw new RuntimeException("超级管理员角色不能删除");
+          }
+          return userService
+              .findAll()
+              .all(
+                  user -> {
+                    Set<Role> set = user.getRoles();
+                    return set.parallelStream().map(Role::getId).anyMatch(r -> r.equals(id));
+                  })
+              .defaultIfEmpty(true)
+              .flatMap(
+                  count -> {
+                    if (!count) return super.delete(id);
+                    else throw new RuntimeException("该角色下有用户，不可删除");
+                  });
+        });
+  }
 
-    @Override
-    public Mono<Boolean> delete(Integer id) {
-        log.info("delete: " + id);
-        Mono<Role> roleMono = find(id);
-        roleMono.subscribe(
-                role -> {
-                    Assert.state(!"administrator".equals(role.getRoleKey()), "超级管理员角色不能删除");
-                    userService
-                            .findAll()
-                            .subscribe(
-                                    user -> {
-                                        Set<Role> set = user.getRoles();
-                                        for (Role r : set) {
-                                            Assert.state((!r.getId().equals(id)), "该角色下有用户，不可删除");
-                                        }
-                                    });
-                });
-        return super.delete(id);
-    }
-
-    @Override
-    public Mono<Role> grant(Integer id, String[] resourceIds) {
-        log.info("grant: " + id);
-        return find(id).map(
-                        role -> {
-                            Assert.notNull(role, "角色不存在");
-                            Assert.state(
-                                    !"administrator".equals(role.getRoleKey()), "超级管理员角色不能进行资源分配");
-                            Set<Resource> resources = new HashSet<Resource>();
-                            if (resourceIds != null) {
-                                for (String resourceId : resourceIds) {
-                                    if (StringUtils.isBlank(resourceId) || "0".equals(resourceId)) {
-                                        continue;
-                                    }
-                                    Integer rid = Integer.parseInt(resourceId);
-                                    Mono<Resource> resource = resourceService.find(rid);
-                                    resource.map(resources::add).subscribe();
-                                }
-                            }
+  @Override
+  public Mono<Role> grant(Integer id, String[] resourceIds) {
+    return find(id)
+        .flatMap(
+            role -> {
+              if (role == null) {
+                throw new RuntimeException("角色不存在");
+              }
+              if ("administrator".equals(role.getRoleKey())) {
+                throw new RuntimeException("超级管理员角色不能进行资源分配");
+              }
+              if (resourceIds != null) {
+                for (String resourceId : resourceIds) {
+                  if (StringUtils.isBlank(resourceId) || "0".equals(resourceId)) {
+                    continue;
+                  }
+                  Integer rid = Integer.parseInt(resourceId);
+                  resourceService
+                      .find(rid)
+                      .map(
+                          r -> {
+                            Set<Resource> resources = new HashSet<>();
+                            resources.add(r);
                             role.setResources(resources);
-                            update(role).subscribe();
-                            return role;
-                        });
-    }
+                            return update(role);
+                          });
+                }
+              }
+              // 不更新
+              return Mono.just(role);
+            })
+        .log();
+  }
 }

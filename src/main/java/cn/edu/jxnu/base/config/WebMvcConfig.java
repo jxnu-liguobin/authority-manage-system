@@ -28,90 +28,89 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SuppressWarnings("deprecation")
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
-    @Autowired private CommonIntercepter commonIntercepter;
+  @Autowired private CommonIntercepter commonIntercepter;
 
-    /**
-     * fastJson相关设置
-     *
-     * @return FastJsonConfig
-     */
-    private FastJsonConfig getFastJsonConfig() {
+  /**
+   * fastJson相关设置
+   *
+   * @return FastJsonConfig
+   */
+  private FastJsonConfig getFastJsonConfig() {
 
-        FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        List<SerializerFeature> serializerFeatureList = new ArrayList<SerializerFeature>();
-        serializerFeatureList.add(SerializerFeature.PrettyFormat);
-        serializerFeatureList.add(SerializerFeature.WriteMapNullValue);
-        serializerFeatureList.add(SerializerFeature.WriteNullStringAsEmpty);
-        serializerFeatureList.add(SerializerFeature.WriteNullListAsEmpty);
-        serializerFeatureList.add(SerializerFeature.DisableCircularReferenceDetect);
-        SerializerFeature[] serializerFeatures =
-                serializerFeatureList.toArray(new SerializerFeature[serializerFeatureList.size()]);
-        fastJsonConfig.setSerializerFeatures(serializerFeatures);
+    FastJsonConfig fastJsonConfig = new FastJsonConfig();
+    List<SerializerFeature> serializerFeatureList = new ArrayList<SerializerFeature>();
+    serializerFeatureList.add(SerializerFeature.PrettyFormat);
+    serializerFeatureList.add(SerializerFeature.WriteMapNullValue);
+    serializerFeatureList.add(SerializerFeature.WriteNullStringAsEmpty);
+    serializerFeatureList.add(SerializerFeature.WriteNullListAsEmpty);
+    serializerFeatureList.add(SerializerFeature.DisableCircularReferenceDetect);
+    SerializerFeature[] serializerFeatures =
+        serializerFeatureList.toArray(new SerializerFeature[serializerFeatureList.size()]);
+    fastJsonConfig.setSerializerFeatures(serializerFeatures);
 
-        return fastJsonConfig;
-    }
+    return fastJsonConfig;
+  }
 
-    /**
-     * fastJson相关设置
-     *
-     * @return FastJsonHttpMessageConverter4
-     */
-    private FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter() {
+  /**
+   * fastJson相关设置
+   *
+   * @return FastJsonHttpMessageConverter4
+   */
+  private FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter() {
 
-        FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter =
-                new FastJsonHttpMessageConverter4();
-        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
-        supportedMediaTypes.add(MediaType.parseMediaType("text/html;charset=UTF-8"));
-        supportedMediaTypes.add(MediaType.parseMediaType("application/json"));
-        fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-        fastJsonHttpMessageConverter.setFastJsonConfig(getFastJsonConfig());
+    FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter =
+        new FastJsonHttpMessageConverter4();
+    List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+    supportedMediaTypes.add(MediaType.parseMediaType("text/html;charset=UTF-8"));
+    supportedMediaTypes.add(MediaType.parseMediaType("application/json"));
+    fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
+    fastJsonHttpMessageConverter.setFastJsonConfig(getFastJsonConfig());
 
-        return fastJsonHttpMessageConverter;
-    }
+    return fastJsonHttpMessageConverter;
+  }
 
-    /**
-     * 添加fastJsonHttpMessageConverter到converters
-     *
-     * @param converters 消息转化器
-     */
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(fastJsonHttpMessageConverter());
-    }
+  /**
+   * 添加fastJsonHttpMessageConverter到converters
+   *
+   * @param converters 消息转化器
+   */
+  @Override
+  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    converters.add(fastJsonHttpMessageConverter());
+  }
 
-    /**
-     * 添加拦截器
-     *
-     * @param registry 拦截器注册
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(commonIntercepter).addPathPatterns("/**");
-        super.addInterceptors(registry);
-    }
+  /**
+   * 添加拦截器
+   *
+   * @param registry 拦截器注册
+   */
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(commonIntercepter).addPathPatterns("/**");
+    super.addInterceptors(registry);
+  }
 
-    /**
-     * Spring 提供了FilterRegistrationBean类，此类提供setOrder方法，可以为filter设置排序值，让spring在注册web
-     * filter之前排序后再依次注册。
-     *
-     * @return FilterRegistrationBean
-     */
-    @Bean
-    public FilterRegistrationBean registFilter() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new OpenEntityManagerInViewFilter());
-        registration.addUrlPatterns("/*");
-        registration.setOrder(1);
-        return registration;
-    }
+  /**
+   * Spring 提供了FilterRegistrationBean类，此类提供setOrder方法，可以为filter设置排序值，让spring在注册web filter之前排序后再依次注册。
+   *
+   * @return FilterRegistrationBean
+   */
+  @Bean
+  public FilterRegistrationBean registFilter() {
+    FilterRegistrationBean registration = new FilterRegistrationBean();
+    registration.setFilter(new OpenEntityManagerInViewFilter());
+    registration.addUrlPatterns("/*");
+    registration.setOrder(1);
+    return registration;
+  }
 
-    /** 域名直接访问主页 */
-    public static String LOGIN_USER = "loginUser";
+  /** 域名直接访问主页 */
+  public static String LOGIN_USER = "loginUser";
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:/admin/login");
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        super.addViewControllers(registry);
-    }
+  @Override
+  public void addViewControllers(ViewControllerRegistry registry) {
+    registry.addViewController("/").setViewName("forward:/admin/login");
+    registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    super.addViewControllers(registry);
+  }
 }
